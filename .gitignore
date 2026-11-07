@@ -1,0 +1,44 @@
+﻿# secrets
+.env
+*.env
+backend/.env
+
+# backend
+backend/uploads/
+backend/*.exe
+backend/*.bak*
+
+# flutter
+mobile/build/
+mobile/.dart_tool/
+mobile/.flutter-plugins*
+mobile/.packages
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/linux/flutter/ephemeral/
+mobile/windows/flutter/ephemeral/
+mobile/macos/Flutter/ephemeral/
+
+# backups jo humne banaye
+*.bak_*
+*.bak
+
+# misc
+.idea/
+.vscode/
+*.log
+
+# backups aur dumps
+backup_*/
+lib_backup_*/
+lib_backup_*.pubspec.yaml
+_lang/
+*.txt
+*.flutter-copy
+
+*.bak[0-9]
+*.bak[0-9][0-9]
+*.backup
+*.mine
+*.new
+mobile/android/build/
