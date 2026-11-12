@@ -1,2 +1,7 @@
-.env
+.env*
+!.env.example
 uploads/
+*.exe
+*.bak*
+*_log.txt
+prompt_dump.txt

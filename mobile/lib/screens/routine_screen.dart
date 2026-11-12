@@ -12,6 +12,13 @@ import '../widgets/common.dart';
 import '../widgets/personal_plan.dart';
 import '../widgets/ring_dashboard.dart';
 import '../widgets/task_celebration.dart';
+import '../widgets/daily_thoughts.dart' show selectedRoutineDay;
+
+bool get _isPastSelected {
+  final n = DateTime.now();
+  final d = selectedRoutineDay.value;
+  return !(d.year == n.year && d.month == n.month && d.day == n.day);
+}
 
 class RoutineScreen extends StatelessWidget {
   const RoutineScreen({super.key});
@@ -19,6 +26,13 @@ class RoutineScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = AppScope.of(context);
+    return ValueListenableBuilder<DateTime>(
+      valueListenable: selectedRoutineDay,
+      builder: (context, _, __) => _page(context, s),
+    );
+  }
+
+  Widget _page(BuildContext context, AppState s) {
     return ResponsivePage(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,6 +61,13 @@ class RoutineScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (_isPastSelected) ...[
+          const InfoNote(
+            'Past day selected: changes are locked. Select today to edit.',
+            icon: Icons.lock_outline_rounded,
+          ),
+          const SizedBox(height: 12),
+        ],
         AppSurface(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +121,7 @@ class RoutineScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         OutlinedButton.icon(
-          onPressed: done == 0 ? null : () => _reset(context, s),
+          onPressed: (done == 0 || _isPastSelected) ? null : () => _reset(context, s),
           icon: const Icon(Icons.restart_alt_rounded),
           label: const Text("Reset today's checks"),
         ),
@@ -177,7 +198,7 @@ class RoutineScreen extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
-              onPressed: () => _guardedAdd(context, s, period),
+              onPressed: _isPastSelected ? null : () => _guardedAdd(context, s, period),
               icon: const Icon(Icons.add_rounded),
               label: Text(
                 'Add ${period == 'morning' ? 'morning' : 'evening'} step',
@@ -196,7 +217,7 @@ class RoutineScreen extends StatelessWidget {
         Builder(builder: (boxContext) => Checkbox(
           value: item.done,
           activeColor: AppColors.primary,
-          onChanged: pending
+          onChanged: (pending || _isPastSelected)
               ? null
               : (v) async {
                   final rect = Celebrate.rectOf(boxContext);
@@ -222,12 +243,12 @@ class RoutineScreen extends StatelessWidget {
         IconButton(
           tooltip: 'Edit ${item.title}',
           icon: const Icon(Icons.edit_outlined),
-          onPressed: () => _edit(context, s, item),
+          onPressed: _isPastSelected ? null : () => _edit(context, s, item),
         ),
         IconButton(
           tooltip: 'Delete ${item.title}',
           icon: const Icon(Icons.delete_outline_rounded),
-          onPressed: () => _delete(context, s, item),
+          onPressed: _isPastSelected ? null : () => _delete(context, s, item),
         ),
       ],
     );
