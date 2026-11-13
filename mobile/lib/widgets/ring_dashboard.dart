@@ -236,8 +236,15 @@ class RingDashboard extends StatelessWidget {
         ? '-'
         : '${w.totalMl > 5000 ? 5000 : w.totalMl}/${w.goalMl} ml';
 
-    final hasSleep = s.sleep.isNotEmpty;
-    final sleepMin = hasSleep ? s.sleep.first.durationMin : 0;
+    final sleepNow = DateTime.now();
+    final todaySleep = s.sleep
+        .where((e) =>
+            e.wake.year == sleepNow.year &&
+            e.wake.month == sleepNow.month &&
+            e.wake.day == sleepNow.day)
+        .toList();
+    final hasSleep = todaySleep.isNotEmpty;
+    final sleepMin = hasSleep ? todaySleep.first.durationMin : 0;
     final sleepV = sleepMin / 480.0;
     final sleepCap = hasSleep ? formatMinutes(sleepMin) : 'No entry';
 

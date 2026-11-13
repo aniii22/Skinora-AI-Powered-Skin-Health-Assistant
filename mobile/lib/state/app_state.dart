@@ -5,6 +5,7 @@ import '../models/models.dart';
 import '../services/api_client.dart';
 import '../services/smart_reminders.dart';
 import '../utils/format.dart';
+import '../widgets/daily_thoughts.dart' show selectedRoutineDay;
 
 typedef SaveOutcome = ({bool ok, String? message});
 
@@ -140,6 +141,9 @@ class AppState extends ChangeNotifier {
       sleep = s;
       journal = j;
       loaded = true;
+      if (_loadedDay.isNotEmpty && _loadedDay != day) {
+        selectedRoutineDay.value = today;
+      }
       _loadedDay = day;
       _lastLoadedAt = DateTime.now();
       _syncSmartReminders();
