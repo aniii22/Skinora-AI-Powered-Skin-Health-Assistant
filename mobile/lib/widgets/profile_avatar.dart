@@ -12,7 +12,7 @@ import '../theme/app_theme.dart';
 
 const _base = String.fromEnvironment(
   'API_BASE_URL',
-  defaultValue: 'http://192.168.1.13:8081',
+  defaultValue: 'https://skinora-ai-powered-skin-health-assistant.onrender.com',
 );
 
 /// Holds the signed-in user's profile photo so every avatar updates together.

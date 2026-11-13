@@ -65,7 +65,11 @@ type limiter struct {
 	hits map[string][]time.Time
 }
 
-func newLimiter() *limiter { return &limiter{hits: map[string][]time.Time{}} }
+func newLimiter() *limiter {
+	l := &limiter{hits: map[string][]time.Time{}}
+	go l.sweepLoop()
+	return l
+}
 
 func (l *limiter) prune(key string, window time.Duration) {
 	cutoff := time.Now().Add(-window)

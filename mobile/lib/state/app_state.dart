@@ -113,7 +113,7 @@ class AppState extends ChangeNotifier {
     notifyListeners();
     final day = todayKey;
     try {
-      final (p, st, r, rh, w, wh, s, j) = await (
+      final res = await Future.wait<dynamic>([
         api.getProfile(),
         api.getSettings(),
         api.listRoutine(day),
@@ -122,7 +122,15 @@ class AppState extends ChangeNotifier {
         api.waterHistory(7, day),
         api.listSleep(),
         api.listJournal(),
-      ).wait;
+      ], eagerError: true);
+      final p = res[0];
+      final st = res[1];
+      final r = res[2];
+      final rh = res[3];
+      final w = res[4];
+      final wh = res[5];
+      final s = res[6];
+      final j = res[7];
       profile = p;
       settings = st;
       routine = r;

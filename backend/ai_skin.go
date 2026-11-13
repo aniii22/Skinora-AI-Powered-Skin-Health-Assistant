@@ -183,6 +183,11 @@ func (a *App) skinAnalysis(c *gin.Context) {
 		serverError(c, err)
 		return
 	}
+	if _, busy := aiInFlight.LoadOrStore(u.ID, true); busy {
+		fail(c, http.StatusTooManyRequests, "Another scan is already running. Please wait for it to finish.")
+		return
+	}
+	defer aiInFlight.Delete(u.ID)
 
 	limit := aiFreeScansTotal
 	if u.premium() {
