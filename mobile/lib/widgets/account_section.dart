@@ -2,7 +2,7 @@ import 'package:flutter/material.dart' hide Text;
 
 import '../l10n/l10n.dart';
 
-import '../auth/premium_screen.dart' show PremiumScreen, handleApiError;
+import '../auth/premium_screen.dart' show PremiumScreen;
 import '../auth/session.dart';
 import '../theme/app_theme.dart';
 import 'common.dart';
@@ -15,7 +15,6 @@ class AccountSection extends StatefulWidget {
 }
 
 class _AccountSectionState extends State<AccountSection> {
-  bool _busy = false;
 
   
 
