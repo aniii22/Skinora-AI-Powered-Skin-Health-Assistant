@@ -9,7 +9,6 @@ import '../state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../widgets/brand_ui.dart';
 import '../widgets/common.dart';
-import '../widgets/premium_ui.dart' show PremiumBadge;
 import '../widgets/profile_avatar.dart';
 import 'insights_screen.dart';
 import 'journal_screen.dart';

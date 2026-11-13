@@ -6,7 +6,6 @@ import '../auth/premium_screen.dart' show showPremiumDialog;
 import '../services/api_client.dart';
 import '../theme/app_theme.dart';
 import 'common.dart';
-import 'premium_ui.dart';
 
 /// Premium-only, rule-based insights from /api/insights/deep.
 class DeepInsightsCard extends StatefulWidget {

@@ -8,12 +8,10 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 import '../auth/session.dart';
+import '../services/api_client.dart' show ApiClient;
 import '../theme/app_theme.dart';
 
-const _base = String.fromEnvironment(
-  'API_BASE_URL',
-  defaultValue: 'https://skinora-ai-powered-skin-health-assistant.onrender.com',
-);
+final String _base = ApiClient().baseUrl;
 
 /// Holds the signed-in user's profile photo so every avatar updates together.
 class ProfilePhotoStore extends ChangeNotifier {

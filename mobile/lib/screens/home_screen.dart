@@ -5,7 +5,6 @@ import '../l10n/l10n.dart';
 import '../auth/premium_screen.dart' show PremiumScreen;
 import '../auth/session.dart';
 import '../state/app_state.dart';
-import '../widgets/premium_ui.dart' show PremiumBadge;
 import '../theme/app_theme.dart';
 import '../utils/format.dart';
 import '../widgets/brand_ui.dart';

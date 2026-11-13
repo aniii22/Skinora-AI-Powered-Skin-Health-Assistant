@@ -6,7 +6,6 @@ import '../auth/premium_screen.dart' show PremiumScreen, handleApiError;
 import '../auth/session.dart';
 import '../theme/app_theme.dart';
 import 'common.dart';
-import 'premium_ui.dart' show PremiumBadge;
 
 /// "Account" block for Settings: plan, Cancel Premium and Sign out.
 class AccountSection extends StatefulWidget {

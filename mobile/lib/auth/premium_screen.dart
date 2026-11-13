@@ -8,7 +8,6 @@ import '../l10n/l10n.dart';
 
 import '../services/api_client.dart' show ApiException;
 import '../widgets/common.dart' show confirmDialog;
-import 'payment.dart';
 import 'session.dart';
 import '../theme/app_theme.dart';
 import '../screens/skin_profile_screen.dart';

@@ -8,7 +8,6 @@ import '../auth/premium_screen.dart' show AccountMenu, PremiumScreen;
 import '../auth/logout_sheet.dart';
 import '../auth/session.dart';
 import '../state/app_state.dart';
-import '../widgets/premium_ui.dart' show PremiumBadge;
 import '../theme/app_theme.dart';
 import 'home_screen.dart';
 import 'notifications_screen.dart';
