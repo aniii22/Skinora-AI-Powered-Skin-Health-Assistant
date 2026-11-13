@@ -40,12 +40,14 @@ class ProfilePhotoStore extends ChangeNotifier {
   }
 
   Future<void> load() async {
-    if (Session.I.token == null) return;
+    final startToken = Session.I.token;
+    if (startToken == null) return;
     loaded = true;
     try {
       final res = await http
           .get(Uri.parse('$_base/api/profile/photo'), headers: _auth)
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 30));
+      if (Session.I.token != startToken) return;
       bytes = res.statusCode == 200 && res.bodyBytes.isNotEmpty
           ? res.bodyBytes
           : null;

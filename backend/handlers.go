@@ -646,17 +646,17 @@ func (a *App) createSleep(c *gin.Context) {
 		return
 	}
 	var dup bool
-    if err := a.db.QueryRow(c.Request.Context(),
-        `SELECT EXISTS (SELECT 1 FROM sleep_logs WHERE user_id = $1 AND wake_time::date = $2::timestamptz::date)`,
-        curUser(c).ID, in.WakeTime).Scan(&dup); err != nil {
-        serverError(c, err)
-        return
-    }
-    if dup {
-        fail(c, http.StatusConflict, "You already logged sleep for this day. Edit it instead.")
-        return
-    }
-    s, err := scanSleep(a.db.QueryRow(c.Request.Context(),
+	if err := a.db.QueryRow(c.Request.Context(),
+		`SELECT EXISTS (SELECT 1 FROM sleep_logs WHERE user_id = $1 AND wake_time::date = $2::timestamptz::date)`,
+		curUser(c).ID, in.WakeTime).Scan(&dup); err != nil {
+		serverError(c, err)
+		return
+	}
+	if dup {
+		fail(c, http.StatusConflict, "You already logged sleep for this day. Edit it instead.")
+		return
+	}
+	s, err := scanSleep(a.db.QueryRow(c.Request.Context(),
 		`INSERT INTO sleep_logs (user_id, sleep_start, wake_time) VALUES ($1, $2, $3) RETURNING `+sleepCols,
 		curUser(c).ID, in.SleepStart, in.WakeTime))
 	if err != nil {
@@ -681,17 +681,17 @@ func (a *App) updateSleep(c *gin.Context) {
 		return
 	}
 	var dup bool
-    if err := a.db.QueryRow(c.Request.Context(),
-        `SELECT EXISTS (SELECT 1 FROM sleep_logs WHERE user_id = $1 AND id <> $3 AND wake_time::date = $2::timestamptz::date)`,
-        curUser(c).ID, in.WakeTime, id).Scan(&dup); err != nil {
-        serverError(c, err)
-        return
-    }
-    if dup {
-        fail(c, http.StatusConflict, "You already logged sleep for this day. Edit it instead.")
-        return
-    }
-    s, err := scanSleep(a.db.QueryRow(c.Request.Context(),
+	if err := a.db.QueryRow(c.Request.Context(),
+		`SELECT EXISTS (SELECT 1 FROM sleep_logs WHERE user_id = $1 AND id <> $3 AND wake_time::date = $2::timestamptz::date)`,
+		curUser(c).ID, in.WakeTime, id).Scan(&dup); err != nil {
+		serverError(c, err)
+		return
+	}
+	if dup {
+		fail(c, http.StatusConflict, "You already logged sleep for this day. Edit it instead.")
+		return
+	}
+	s, err := scanSleep(a.db.QueryRow(c.Request.Context(),
 		`UPDATE sleep_logs SET sleep_start = $1, wake_time = $2 WHERE id = $3 AND user_id = $4 RETURNING `+sleepCols,
 		in.SleepStart, in.WakeTime, id, curUser(c).ID))
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -1125,5 +1125,6 @@ func (a *App) clearData(c *gin.Context) {
 	for _, f := range files {
 		a.removePhotoFile(f)
 	}
+	a.purgeExtraUserData(ctx, uid)
 	c.Status(http.StatusNoContent)
 }

@@ -104,7 +104,7 @@ func cashfreeCall(ctx context.Context, method, path string, payload any) (int, [
 	return res.StatusCode, body, nil
 }
 
-func (a *App) ensurePaymentsTable(ctx context.Context) error {
+func (a *App) createPaymentsTable(ctx context.Context) error {
 	stmts := []string{
 		`CREATE TABLE IF NOT EXISTS payments (
 order_id TEXT PRIMARY KEY,
