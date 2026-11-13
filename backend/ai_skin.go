@@ -104,7 +104,8 @@ func videoFrames(ctx context.Context, fh *multipart.FileHeader, n int) ([][]byte
 	}
 	dir, err := os.MkdirTemp("", "skinora-video-")
 	if err != nil {
-		return nil, err
+		log.Printf("video temp dir: %v", err)
+		return nil, fmt.Errorf("could not process the video")
 	}
 	defer os.RemoveAll(dir)
 
@@ -116,7 +117,8 @@ func videoFrames(ctx context.Context, fh *multipart.FileHeader, n int) ([][]byte
 	dst, err := os.Create(in)
 	if err != nil {
 		src.Close()
-		return nil, err
+		log.Printf("video temp file: %v", err)
+		return nil, fmt.Errorf("could not process the video")
 	}
 	_, err = io.Copy(dst, io.LimitReader(src, aiMaxVideoBytes+1))
 	src.Close()

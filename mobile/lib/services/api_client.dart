@@ -95,7 +95,7 @@ class ApiClient {
     } else {
       msg = 'Request failed (${res.statusCode}).';
     }
-    if (res.statusCode == 401) Session.I.expire();
+    if (res.statusCode == 401 && Session.I.token == token) Session.I.expire();
     throw ApiException(msg, res.statusCode);
   }
 

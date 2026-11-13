@@ -66,7 +66,7 @@ func requestLimits(timeout time.Duration) gin.HandlerFunc {
 
 		// AI analysis may contain an image and multipart metadata.
 		if isAI {
-			limit = int64(aiMaxTotalBytes) + (1 << 20)
+			limit = int64(aiMaxVideoBytes) + (1 << 20)
 		}
 
 		c.Request.Body = http.MaxBytesReader(
