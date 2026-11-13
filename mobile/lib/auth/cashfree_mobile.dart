@@ -44,5 +44,10 @@ Future<void> payOnMobile({
       done.completeError(ApiException('Could not open the payment screen.'));
     }
   }
-  return done.future;
+  return done.future.timeout(
+    const Duration(minutes: 10),
+    onTimeout: () => throw ApiException(
+      'Payment is taking too long. If money was deducted, reopen the app to confirm.',
+    ),
+  );
 }

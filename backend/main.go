@@ -37,7 +37,7 @@ func main() {
 		Handler:           app.router(),
 		ReadHeaderTimeout: 10 * time.Second,
 		ReadTimeout:       60 * time.Second,
-		WriteTimeout:      60 * time.Second,
+		WriteTimeout:      120 * time.Second,
 		IdleTimeout:       120 * time.Second,
 	}
 	log.Printf("Skinora API listening on :%s (premium demo: %v)", cfg.Port, cfg.PremiumDemo)

@@ -82,6 +82,9 @@ func requestLimits(timeout time.Duration) gin.HandlerFunc {
 // router registers middleware and application routes.
 func (a *App) router() *gin.Engine {
 	r := gin.New()
+	if err := r.SetTrustedProxies([]string{"127.0.0.1", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"}); err != nil {
+		log.Fatal(err)
+	}
 
 	r.Use(
 		gin.Logger(),

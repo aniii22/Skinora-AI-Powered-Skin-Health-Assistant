@@ -53,7 +53,7 @@ class ApiClient {
 
   Future<dynamic> _finish(
     http.BaseRequest req, {
-    Duration timeout = const Duration(seconds: 15),
+    Duration timeout = const Duration(seconds: 60),
   }) async {
     final token = Session.I.token;
     if (token != null) req.headers['Authorization'] = 'Bearer $token';
