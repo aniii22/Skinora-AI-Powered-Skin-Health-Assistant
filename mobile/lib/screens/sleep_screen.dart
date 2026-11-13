@@ -476,6 +476,12 @@ class _SleepEditorScreenState extends State<SleepEditorScreen> {
     if (_wake.isAfter(DateTime.now().add(const Duration(minutes: 5)))) {
       return 'Wake-up time cannot be in the future.';
     }
+    final others = AppScope.read(context).sleep.where((e) => e.id != widget.existing?.id);
+    for (final e in others) {
+      if (_bed.isBefore(e.wake) && _wake.isAfter(e.start)) {
+        return 'This overlaps another sleep entry. Edit that entry instead.';
+      }
+    }
     return null;
   }
 

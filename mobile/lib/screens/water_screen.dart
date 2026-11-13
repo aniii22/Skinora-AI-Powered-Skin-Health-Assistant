@@ -172,7 +172,7 @@ class _WaterScreenState extends State<WaterScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: FilledButton.icon(
-                      onPressed: (_busy || w.totalMl >= 5000)
+                      onPressed: (_busy || w.totalMl + w.glassMl > 5000)
                           ? null
                           : () => _run(
                               () => AppScope.read(context).addWater(w.glassMl),
@@ -181,7 +181,7 @@ class _WaterScreenState extends State<WaterScreen> {
                       label: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          w.totalMl >= 5000
+                          w.totalMl + w.glassMl > 5000
                               ? 'Limit reached (5000 ml)'
                               : 'Add glass (${w.glassMl} ml)',
                           maxLines: 1,
