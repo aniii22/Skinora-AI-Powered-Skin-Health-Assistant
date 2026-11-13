@@ -574,10 +574,14 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
   }
 
   Future<void> _pickDay() async {
+    final now = DateTime.now();
+    final first = Session.I.user?.isPremium == true
+        ? DateTime(2020)
+        : DateTime(now.year, now.month, now.day - 1);
     final d = await showDatePicker(
       context: context,
-      initialDate: _day,
-      firstDate: DateTime(2020),
+      initialDate: _day.isBefore(first) ? first : _day,
+      firstDate: first,
       lastDate: DateTime.now(),
     );
     if (d != null && mounted) {
