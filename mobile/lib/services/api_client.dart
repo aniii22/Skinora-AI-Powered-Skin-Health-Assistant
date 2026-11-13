@@ -63,7 +63,9 @@ class ApiClient {
     }
     http.Response res;
     try {
-      res = await (() async => http.Response.fromStream(await _http.send(req)))().timeout(timeout);
+      res = await (() async => http.Response.fromStream(
+        await _http.send(req),
+      ))().timeout(timeout);
     } on TimeoutException {
       throw ApiException('The server took too long to respond.');
     } catch (_) {
@@ -114,8 +116,9 @@ class ApiClient {
   // ---- health ----
   Future<String> health() async {
     final m = _map(await _send('GET', '/api/health'));
-    if (m['status'] != 'ok')
+    if (m['status'] != 'ok') {
       throw ApiException('API returned an unexpected status');
+    }
     return m['message']?.toString() ?? 'Skinora API is running';
   }
 
@@ -318,10 +321,12 @@ class ApiClient {
         ),
       );
     }
-    if (skinType != null && skinType.isNotEmpty)
+    if (skinType != null && skinType.isNotEmpty) {
       req.fields['skin_type'] = skinType;
-    if (note != null && note.trim().isNotEmpty)
+    }
+    if (note != null && note.trim().isNotEmpty) {
       req.fields['note'] = note.trim();
+    }
     req.fields['lang'] = Lang.I.code;
     return _map(await _finish(req, timeout: const Duration(seconds: 120)));
   }

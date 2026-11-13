@@ -2,8 +2,6 @@ import 'package:flutter/material.dart' hide Text;
 
 import '../l10n/l10n.dart';
 
-import '../auth/premium_screen.dart' show PremiumScreen;
-import '../auth/session.dart';
 import '../state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../utils/format.dart';
@@ -322,5 +320,3 @@ class _HydrationCardState extends State<_HydrationCard> {
     );
   }
 }
-
-

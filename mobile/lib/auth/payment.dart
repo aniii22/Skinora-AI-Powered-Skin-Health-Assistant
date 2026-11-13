@@ -1,5 +1,7 @@
 import '../services/api_client.dart';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
+
 import 'cashfree_mobile_stub.dart'
     if (dart.library.io) 'cashfree_mobile.dart'
     as mobile;
@@ -26,11 +28,12 @@ Future<void> payForPremium(String plan) async {
       sessionId: (o['payment_session_id'] ?? '').toString(),
       mode: (o['mode'] ?? 'sandbox').toString(),
     );
-  } else
-  await cashfree.openCashfreeCheckout(
-    sessionId: (o['payment_session_id'] ?? '').toString(),
-    mode: (o['mode'] ?? 'sandbox').toString(),
-  );
+  } else {
+    await cashfree.openCashfreeCheckout(
+      sessionId: (o['payment_session_id'] ?? '').toString(),
+      mode: (o['mode'] ?? 'sandbox').toString(),
+    );
+  }
 
   final u = await api.request(
     'POST',

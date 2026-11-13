@@ -91,7 +91,12 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
           titleSpacing: 20,
           title: Row(
             children: [
-              Image.asset('assets/images/logo.png', width: 36, height: 36, fit: BoxFit.contain),
+              Image.asset(
+                'assets/images/logo.png',
+                width: 36,
+                height: 36,
+                fit: BoxFit.contain,
+              ),
               const SizedBox(width: 9),
               const Text(
                 'Skinora',
@@ -138,7 +143,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
               builder: (context, _) => Session.I.user?.isPremium == true
                   ? const Padding(
                       padding: EdgeInsets.only(right: 4),
-                      child: const SizedBox.shrink(),
+                      child: SizedBox.shrink(),
                     )
                   : const SizedBox.shrink(),
             ),

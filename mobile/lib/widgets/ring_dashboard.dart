@@ -87,7 +87,8 @@ class _RingPopState extends State<_RingPop> {
     }
     if (_RingPop._shown[id] == true) return;
     final route = ModalRoute.of(context);
-    final visible = (route?.isCurrent ?? true) && TickerMode.of(context);
+    final visible =
+        (route?.isCurrent ?? true) && TickerMode.valuesOf(context).enabled;
     if (!visible) return;
     _RingPop._shown[id] = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -144,70 +145,73 @@ class DashTile extends StatelessWidget {
               mouseCursor: onTap == null
                   ? SystemMouseCursors.basic
                   : SystemMouseCursors.click,
-              child: PremiumCorner(show: premiumFeature, child: Container(
-                padding: const EdgeInsets.fromLTRB(10, 14, 10, 12),
-                decoration: BoxDecoration(
-                  borderRadius: radius,
-                  border: Border.all(color: AppColors.border),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: .08),
-                      blurRadius: 18,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _RingPop(
-                      id: celebrateId,
-                      value: v,
-                      child: SizedBox(
-                        width: 72,
-                        height: 72,
-                        child: CustomPaint(
-                          painter: _RingPainter(v ?? 0, color, track),
-                          child: Center(
-                            child: v != null
-                                ? Text(
-                                    '${(v.clamp(0.0, 1.0) * 100).round()}%',
-                                    style: TextStyle(
-                                      color: color,
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 15,
-                                    ),
-                                  )
-                                : Icon(icon, color: color, size: 28),
+              child: PremiumCorner(
+                show: premiumFeature,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 14, 10, 12),
+                  decoration: BoxDecoration(
+                    borderRadius: radius,
+                    border: Border.all(color: AppColors.border),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: .08),
+                        blurRadius: 18,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      _RingPop(
+                        id: celebrateId,
+                        value: v,
+                        child: SizedBox(
+                          width: 72,
+                          height: 72,
+                          child: CustomPaint(
+                            painter: _RingPainter(v ?? 0, color, track),
+                            child: Center(
+                              child: v != null
+                                  ? Text(
+                                      '${(v.clamp(0.0, 1.0) * 100).round()}%',
+                                      style: TextStyle(
+                                        color: color,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 15,
+                                      ),
+                                    )
+                                  : Icon(icon, color: color, size: 28),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(icon, size: 14, color: color),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(
-                            title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppText.cardTitle.copyWith(fontSize: 13),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(icon, size: 14, color: color),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppText.cardTitle.copyWith(fontSize: 13),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      caption,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppText.caption.copyWith(fontSize: 11.5),
-                    ),
-                  ],
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        caption,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppText.caption.copyWith(fontSize: 11.5),
+                      ),
+                    ],
+                  ),
                 ),
-              )),
+              ),
             ),
           ),
         ),
@@ -238,10 +242,12 @@ class RingDashboard extends StatelessWidget {
 
     final sleepNow = DateTime.now();
     final todaySleep = s.sleep
-        .where((e) =>
-            e.wake.year == sleepNow.year &&
-            e.wake.month == sleepNow.month &&
-            e.wake.day == sleepNow.day)
+        .where(
+          (e) =>
+              e.wake.year == sleepNow.year &&
+              e.wake.month == sleepNow.month &&
+              e.wake.day == sleepNow.day,
+        )
         .toList();
     final hasSleep = todaySleep.isNotEmpty;
     final sleepMin = hasSleep ? todaySleep.first.durationMin : 0;
@@ -321,7 +327,9 @@ class WeekStrip extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([selectedRoutineDay, Session.I]),
       builder: (context, _) {
-        final sel = _future(selectedRoutineDay.value) ? _d(DateTime.now()) : selectedRoutineDay.value;
+        final sel = _future(selectedRoutineDay.value)
+            ? _d(DateTime.now())
+            : selectedRoutineDay.value;
         return Row(
           children: [
             for (var i = 0; i < 7; i++) ...[
@@ -394,7 +402,11 @@ class WeekStrip extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: selected ? Colors.white : (_future(d) ? AppColors.muted.withValues(alpha: .45) : AppColors.deep),
+                      color: selected
+                          ? Colors.white
+                          : (_future(d)
+                                ? AppColors.muted.withValues(alpha: .45)
+                                : AppColors.deep),
                     ),
                   ),
                 ],

@@ -159,26 +159,6 @@ class Session extends ChangeNotifier {
     await _clear();
   }
 
-  Future<void> activatePremium(String plan) async {
-    user = AppUser.fromJson(
-      _m(
-        await _api.request(
-          'POST',
-          '/api/premium/activate',
-          body: {'plan': plan},
-        ),
-      ),
-    );
-    notifyListeners();
-  }
-
-  Future<void> cancelPremium() async {
-    user = AppUser.fromJson(
-      _m(await _api.request('POST', '/api/premium/cancel')),
-    );
-    notifyListeners();
-  }
-
   /// Change name or email. Changing the email needs the current password.
   Future<void> updateProfile({
     required String name,

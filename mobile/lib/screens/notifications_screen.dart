@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
+import '../l10n/l10n.dart';
 
 import '../auth/session.dart';
 import '../services/api_client.dart';

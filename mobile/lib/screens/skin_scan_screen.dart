@@ -487,8 +487,17 @@ class _SkinScanScreenState extends State<SkinScanScreen> {
           runSpacing: 4,
           children: [
             for (final t in _types)
-              ChoiceChip(checkmarkColor: Colors.white, 
-                label: Text(_pretty(t), style: TextStyle(color: (_skinType == t) ? Colors.white : const Color(0xFF39205F), fontWeight: FontWeight.w700)),
+              ChoiceChip(
+                checkmarkColor: Colors.white,
+                label: Text(
+                  _pretty(t),
+                  style: TextStyle(
+                    color: (_skinType == t)
+                        ? Colors.white
+                        : const Color(0xFF39205F),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 selected: _skinType == t,
                 onSelected: _busy
                     ? null
@@ -497,15 +506,41 @@ class _SkinScanScreenState extends State<SkinScanScreen> {
           ],
         ),
         const SizedBox(height: 12),
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const SizedBox(height: 22), const Divider(height: 1), const SizedBox(height: 16), const Text('Common problems', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: Color(0xFF39205F))), const SizedBox(height: 4), const Text('Tap to add, tap again to remove.', style: TextStyle(fontSize: 12, color: Color(0xFF81778F))), const SizedBox(height: 12), _ProblemChips(controller: _note), const SizedBox(height: 22), TextField(
-          controller: _note,
-          enabled: !_busy,
-          maxLength: 300,
-          maxLines: 2,
-          decoration: InputDecoration(
-            labelText: Lang.I.tr('Anything specific? (optional, e.g. pimples on cheeks)'),
-          ),
-        )]),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 22),
+            const Divider(height: 1),
+            const SizedBox(height: 16),
+            const Text(
+              'Common problems',
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF39205F),
+              ),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Tap to add, tap again to remove.',
+              style: TextStyle(fontSize: 12, color: Color(0xFF81778F)),
+            ),
+            const SizedBox(height: 12),
+            _ProblemChips(controller: _note),
+            const SizedBox(height: 22),
+            TextField(
+              controller: _note,
+              enabled: !_busy,
+              maxLength: 300,
+              maxLines: 2,
+              decoration: InputDecoration(
+                labelText: Lang.I.tr(
+                  'Anything specific? (optional, e.g. pimples on cheeks)',
+                ),
+              ),
+            ),
+          ],
+        ),
       ],
     ),
   );
@@ -910,7 +945,7 @@ class _ProblemChips extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: controller,
-      builder: (context, _, __) {
+      builder: (context, _, _) {
         final chosen = _parts().map((e) => e.toLowerCase()).toSet();
         return Wrap(
           spacing: 8,

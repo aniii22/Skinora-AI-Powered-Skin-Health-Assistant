@@ -28,7 +28,7 @@ class RoutineScreen extends StatelessWidget {
     final s = AppScope.of(context);
     return ValueListenableBuilder<DateTime>(
       valueListenable: selectedRoutineDay,
-      builder: (context, _, __) => _page(context, s),
+      builder: (context, _, _) => _page(context, s),
     );
   }
 
@@ -121,7 +121,9 @@ class RoutineScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         OutlinedButton.icon(
-          onPressed: (done == 0 || _isPastSelected) ? null : () => _reset(context, s),
+          onPressed: (done == 0 || _isPastSelected)
+              ? null
+              : () => _reset(context, s),
           icon: const Icon(Icons.restart_alt_rounded),
           label: const Text("Reset today's checks"),
         ),
@@ -198,7 +200,9 @@ class RoutineScreen extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
-              onPressed: _isPastSelected ? null : () => _guardedAdd(context, s, period),
+              onPressed: _isPastSelected
+                  ? null
+                  : () => _guardedAdd(context, s, period),
               icon: const Icon(Icons.add_rounded),
               label: Text(
                 'Add ${period == 'morning' ? 'morning' : 'evening'} step',
@@ -214,22 +218,27 @@ class RoutineScreen extends StatelessWidget {
     final pending = s.pendingRoutine.contains(item.id);
     return Row(
       children: [
-        Builder(builder: (boxContext) => Checkbox(
-          value: item.done,
-          activeColor: AppColors.primary,
-          onChanged: (pending || _isPastSelected)
-              ? null
-              : (v) async {
-                  final rect = Celebrate.rectOf(boxContext);
-                  final err = await s.setRoutineDone(item, v ?? false);
-                  if (err == null && v == true && rect != null && context.mounted) {
-                    Celebrate.show(context, rect, message: item.title);
-                  }
-                  if (err != null && context.mounted) {
-                    showSnack(context, err, error: true);
-                  }
-                },
-        )),
+        Builder(
+          builder: (boxContext) => Checkbox(
+            value: item.done,
+            activeColor: AppColors.primary,
+            onChanged: (pending || _isPastSelected)
+                ? null
+                : (v) async {
+                    final rect = Celebrate.rectOf(boxContext);
+                    final err = await s.setRoutineDone(item, v ?? false);
+                    if (err == null &&
+                        v == true &&
+                        rect != null &&
+                        context.mounted) {
+                      Celebrate.show(context, rect, message: item.title);
+                    }
+                    if (err != null && context.mounted) {
+                      showSnack(context, err, error: true);
+                    }
+                  },
+          ),
+        ),
         Expanded(
           child: Text(
             item.title,

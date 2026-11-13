@@ -51,7 +51,8 @@ class _WaterScreenState extends State<WaterScreen> {
     }
     final ok = await _run(() => AppScope.read(context).addWater(ml));
     if (ok && mounted) {
-      _formKey.currentState?.reset(); _ctrl.clear();
+      _formKey.currentState?.reset();
+      _ctrl.clear();
       FocusScope.of(context).unfocus();
       showSnack(context, 'Added $ml ml');
     }
@@ -224,9 +225,12 @@ class _WaterScreenState extends State<WaterScreen> {
                           final t = (v ?? '').trim();
                           if (t.isEmpty) return 'Enter an amount in ml';
                           final n = int.tryParse(t);
-                          if (n == null || n < 1 || n > 1000)
+                          if (n == null || n < 1 || n > 1000) {
                             return 'Enter 1 to 1000 ml';
-                          final left = 5000 - (AppScope.read(context).water?.totalMl ?? 0);
+                          }
+                          final left =
+                              5000 -
+                              (AppScope.read(context).water?.totalMl ?? 0);
                           if (n > left) {
                             return left <= 0
                                 ? 'Daily limit reached (5000 ml)'
@@ -240,7 +244,9 @@ class _WaterScreenState extends State<WaterScreen> {
                     SizedBox(
                       height: 56,
                       child: FilledButton(
-                        onPressed: (_busy || w.totalMl >= 5000) ? null : _addCustom,
+                        onPressed: (_busy || w.totalMl >= 5000)
+                            ? null
+                            : _addCustom,
                         child: const Text('Add'),
                       ),
                     ),

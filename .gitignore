@@ -46,3 +46,7 @@ mobile/android/build/
 .env
 *.env.bak*
 backup_fix*/
+
+.safe-backups/
+*.f19-backup
+*.backup-before-lint-fix
