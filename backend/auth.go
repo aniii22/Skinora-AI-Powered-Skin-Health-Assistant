@@ -261,8 +261,10 @@ func (a *App) login(c *gin.Context) {
 	}
 	email := strings.ToLower(strings.TrimSpace(in.Email))
 	key := "login|" + c.ClientIP() + "|" + email
+	emailKey := "loginemail|" + email
+	ipKey := "loginip|" + c.ClientIP()
 	const window = 15 * time.Minute
-	if a.lim.blocked(key, 5, window) {
+	if a.lim.blocked(key, 5, window) || a.lim.blocked(emailKey, 10, window) || a.lim.blocked(ipKey, 30, window) {
 		fail(c, http.StatusTooManyRequests, "Too many failed attempts. Please try again in a few minutes.")
 		return
 	}
@@ -275,6 +277,8 @@ func (a *App) login(c *gin.Context) {
 	if errors.Is(err, pgx.ErrNoRows) {
 		_ = bcrypt.CompareHashAndPassword(dummyHash, []byte(in.Password))
 		a.lim.add(key, window)
+		a.lim.add(emailKey, window)
+		a.lim.add(ipKey, window)
 		fail(c, http.StatusUnauthorized, "Incorrect email or password.")
 		return
 	}
@@ -284,6 +288,8 @@ func (a *App) login(c *gin.Context) {
 	}
 	if bcrypt.CompareHashAndPassword([]byte(hash), []byte(in.Password)) != nil {
 		a.lim.add(key, window)
+		a.lim.add(emailKey, window)
+		a.lim.add(ipKey, window)
 		fail(c, http.StatusUnauthorized, "Incorrect email or password.")
 		return
 	}
@@ -338,8 +344,14 @@ func (a *App) deleteAccount(c *gin.Context) {
 		serverError(c, err)
 		return
 	}
+	delKey := "delacct|" + u.Email
+	if a.lim.blocked(delKey, 5, 15*time.Minute) {
+		fail(c, http.StatusTooManyRequests, "Too many wrong passwords. Try again in a few minutes.")
+		return
+	}
 	// 403 (not 401) so the app does not mistake a typo for an expired session.
 	if bcrypt.CompareHashAndPassword([]byte(hash), []byte(in.Password)) != nil {
+		a.lim.add(delKey, 15*time.Minute)
 		fail(c, http.StatusForbidden, "Incorrect password.")
 		return
 	}

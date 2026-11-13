@@ -71,7 +71,7 @@ Rules:
 Respond with ONLY a JSON object, no markdown, in exactly this shape:
 {"observations":[""],"confidence":"medium","summary":"","concerns":[""],"possible_causes":[""],"recommendations":[""],"routine_morning":[""],"routine_evening":[""],"lifestyle":[""],"products":[{"type":"","key_ingredients":[""],"why":"","usage":""}],"avoid":[""],"see_doctor":false,"see_doctor_reason":"","disclaimer":"General skincare guidance, not a medical diagnosis."}`
 
-func (a *App) ensureAIScans(ctx context.Context) error {
+func (a *App) createAIScansTable(ctx context.Context) error {
 	_, err := a.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS ai_scans (
 id BIGSERIAL PRIMARY KEY,
 user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,

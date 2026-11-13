@@ -46,9 +46,9 @@ func (a *App) uploadProfilePhoto(c *gin.Context) {
 		ext = ".png"
 	case "image/webp":
 		ext = ".webp"
-		case "image/gif":
+	case "image/gif":
 		ext = ".gif"
-		default:
+	default:
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Only JPEG, PNG, WebP and GIF images are supported"})
 		return
 	}
@@ -61,9 +61,9 @@ func (a *App) uploadProfilePhoto(c *gin.Context) {
 	}
 
 	filename := "profile_" + hex.EncodeToString(random) + ext
-	relativePath := filepath.Join("uploads", filename)
+	relativePath := filepath.Join(a.cfg.UploadDir, filename)
 
-	if err := os.MkdirAll("uploads", 0750); err != nil {
+	if err := os.MkdirAll(a.cfg.UploadDir, 0750); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Photo storage unavailable"})
 		return
 	}
@@ -93,7 +93,7 @@ func (a *App) uploadProfilePhoto(c *gin.Context) {
 		VALUES ($1, '', 'normal', '{}', false, $2)
 		ON CONFLICT (user_id)
 		DO UPDATE SET photo_file = EXCLUDED.photo_file
-	`, uid, relativePath)
+	`, uid, filename)
 
 	if err != nil {
 		_ = os.Remove(relativePath)
@@ -101,10 +101,10 @@ func (a *App) uploadProfilePhoto(c *gin.Context) {
 		return
 	}
 
-	if oldPath != "" && oldPath != relativePath {
+	if oldPath != "" && oldPath != filename {
 		safeOld := filepath.Base(oldPath)
 		if strings.HasPrefix(safeOld, "profile_") {
-			_ = os.Remove(filepath.Join("uploads", safeOld))
+			_ = os.Remove(filepath.Join(a.cfg.UploadDir, safeOld))
 		}
 	}
 
@@ -134,7 +134,7 @@ func (a *App) getProfilePhoto(c *gin.Context) {
 		return
 	}
 
-	data, err := os.ReadFile(filepath.Join("uploads", name))
+	data, err := os.ReadFile(filepath.Join(a.cfg.UploadDir, name))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Profile photo not found"})
 		return
@@ -172,7 +172,7 @@ func (a *App) deleteProfilePhoto(c *gin.Context) {
 
 	name := filepath.Base(storedPath)
 	if strings.HasPrefix(name, "profile_") {
-		_ = os.Remove(filepath.Join("uploads", name))
+		_ = os.Remove(filepath.Join(a.cfg.UploadDir, name))
 	}
 
 	c.Status(http.StatusNoContent)

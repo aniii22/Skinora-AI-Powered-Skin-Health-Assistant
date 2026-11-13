@@ -215,12 +215,12 @@ class AppState extends ChangeNotifier {
   // ---- routine ----
   Future<void> _reloadRoutine() async {
     final day = todayKey;
-    final (items, history) = await (
+    final res = await Future.wait<dynamic>([
       api.listRoutine(day),
       api.routineHistory(7, day),
-    ).wait;
-    routine = items;
-    routineHistory = history;
+    ], eagerError: true);
+    routine = res[0];
+    routineHistory = res[1];
   }
 
   Future<String?> addRoutineItem(String period, String title) => _run(() async {
@@ -259,9 +259,12 @@ class AppState extends ChangeNotifier {
   // ---- water ----
   Future<void> _reloadWater() async {
     final day = todayKey;
-    final (w, h) = await (api.waterSummary(day), api.waterHistory(7, day)).wait;
-    water = w;
-    waterHistory = h;
+    final res = await Future.wait<dynamic>([
+      api.waterSummary(day),
+      api.waterHistory(7, day),
+    ], eagerError: true);
+    water = res[0];
+    waterHistory = res[1];
   }
 
   Future<String?> addWater(int ml) => _run(() async {
