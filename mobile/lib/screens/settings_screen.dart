@@ -216,7 +216,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const AppSurface(
               child: Text(
                 'Your data is stored in the database and uploads folder of the Skinora server you run. '
-                'Photos are not encrypted and are not sent to any third party. '
+                'Photos are not encrypted. If you use AI Skin Scan, the photos or video you choose are sent to an external AI service to create the analysis. '
                 'Your data is tied to your account and protected by your password.',
                 style: AppText.body,
               ),

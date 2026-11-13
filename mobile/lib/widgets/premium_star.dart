@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart' hide Text;
-import '../l10n/l10n.dart';
 
 import '../auth/session.dart';
 import '../theme/app_theme.dart';
