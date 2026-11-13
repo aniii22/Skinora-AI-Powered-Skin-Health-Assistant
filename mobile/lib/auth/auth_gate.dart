@@ -5,6 +5,8 @@ import '../l10n/l10n.dart';
 import 'auth_screen.dart';
 import 'session.dart';
 
+bool _wasSignedIn = false;
+
 /// Shows login/register until the user is signed in, then [child].
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key, required this.child});
@@ -13,7 +15,14 @@ class AuthGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: Session.I,
-    builder: (_, _) {
+    builder: (ctx, _) {
+      final inNow = Session.I.signedIn;
+      if (_wasSignedIn && !inNow) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (ctx.mounted) Navigator.of(ctx).popUntil((r) => r.isFirst);
+        });
+      }
+      _wasSignedIn = inNow;
       if (!Session.I.ready) {
         return const Scaffold(body: Center(child: CircularProgressIndicator()));
       }

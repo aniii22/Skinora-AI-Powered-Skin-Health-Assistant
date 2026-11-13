@@ -271,10 +271,13 @@ class AppState extends ChangeNotifier {
     waterHistory = res[1];
   }
 
-  Future<String?> addWater(int ml) => _run(() async {
-    await api.addWater(todayKey, ml);
-    await _reloadWater();
-  });
+  Future<String?> addWater(int ml) async {
+    if ((water?.totalMl ?? 0) + ml > 5000) return 'Daily limit reached (5000 ml)';
+    return _run(() async {
+      await api.addWater(todayKey, ml);
+      await _reloadWater();
+    });
+  }
 
   Future<String?> removeLastWater() => _run(() async {
     await api.removeLastWater(todayKey);

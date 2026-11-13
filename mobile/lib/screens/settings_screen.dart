@@ -210,26 +210,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 22),
-            AppSurface(
-              child: ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.notifications_active_rounded, color: AppColors.primary),
-                title: const Text('Reminders & notifications'),
-                subtitle: const Text('Water, skincare, quiet hours'),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const RemindersScreen()),
-                ),
-              ),
-            ),
-            const SizedBox(height: 22),
             const AccountSection(),
-            const SizedBox(height: 22),
-            const SectionLabel('Notifications'),
-            const InfoNote(
-              'Reminders are not available yet. Skinora does not send notifications.',
-              icon: Icons.notifications_off_outlined,
-            ),
             const SizedBox(height: 22),
             const SectionLabel('Privacy'),
             const AppSurface(
