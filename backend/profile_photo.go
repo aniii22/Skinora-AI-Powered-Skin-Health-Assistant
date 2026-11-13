@@ -9,31 +9,38 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
 )
 
 func (a *App) uploadProfilePhoto(c *gin.Context) {
+	upKey := "photoup|" + curUser(c).Email
+	if a.lim.blocked(upKey, 20, time.Hour) {
+		fail(c, http.StatusTooManyRequests, "Too many photo uploads. Try again later.")
+		return
+	}
+	a.lim.add(upKey, time.Hour)
 	file, header, err := c.Request.FormFile("photo")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Select a photo to upload"})
+		fail(c, http.StatusBadRequest, "Select a photo to upload")
 		return
 	}
 	defer file.Close()
 
 	if header.Size > maxPhotoBytes {
-		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"message": "Photo must be 5 MB or smaller"})
+		fail(c, http.StatusRequestEntityTooLarge, "Photo must be 5 MB or smaller")
 		return
 	}
 
 	data, err := io.ReadAll(io.LimitReader(file, maxPhotoBytes+1))
 	if err != nil || len(data) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Could not read photo"})
+		fail(c, http.StatusBadRequest, "Could not read photo")
 		return
 	}
 	if len(data) > maxPhotoBytes {
-		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"message": "Photo must be 5 MB or smaller"})
+		fail(c, http.StatusRequestEntityTooLarge, "Photo must be 5 MB or smaller")
 		return
 	}
 
@@ -49,14 +56,14 @@ func (a *App) uploadProfilePhoto(c *gin.Context) {
 	case "image/gif":
 		ext = ".gif"
 	default:
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Only JPEG, PNG, WebP and GIF images are supported"})
+		fail(c, http.StatusBadRequest, "Only JPEG, PNG, WebP and GIF images are supported")
 		return
 	}
 
 	// Generate a random filename; never trust the supplied filename.
 	random := make([]byte, 16)
 	if _, err := rand.Read(random); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not create photo filename"})
+		fail(c, http.StatusInternalServerError, "Could not create photo filename")
 		return
 	}
 
@@ -64,12 +71,12 @@ func (a *App) uploadProfilePhoto(c *gin.Context) {
 	relativePath := filepath.Join(a.cfg.UploadDir, filename)
 
 	if err := os.MkdirAll(a.cfg.UploadDir, 0750); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Photo storage unavailable"})
+		fail(c, http.StatusInternalServerError, "Photo storage unavailable")
 		return
 	}
 
 	if err := os.WriteFile(relativePath, data, 0600); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not save photo"})
+		fail(c, http.StatusInternalServerError, "Could not save photo")
 		return
 	}
 
@@ -83,7 +90,7 @@ func (a *App) uploadProfilePhoto(c *gin.Context) {
 
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		_ = os.Remove(relativePath)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not read existing profile photo"})
+		fail(c, http.StatusInternalServerError, "Could not read existing profile photo")
 		return
 	}
 
@@ -97,7 +104,7 @@ func (a *App) uploadProfilePhoto(c *gin.Context) {
 
 	if err != nil {
 		_ = os.Remove(relativePath)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not update profile photo"})
+		fail(c, http.StatusInternalServerError, "Could not update profile photo")
 		return
 	}
 
@@ -124,19 +131,19 @@ func (a *App) getProfilePhoto(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not load profile photo"})
+		fail(c, http.StatusInternalServerError, "Could not load profile photo")
 		return
 	}
 
 	name := filepath.Base(storedPath)
 	if !strings.HasPrefix(name, "profile_") {
-		c.JSON(http.StatusNotFound, gin.H{"message": "Profile photo not found"})
+		fail(c, http.StatusNotFound, "Profile photo not found")
 		return
 	}
 
 	data, err := os.ReadFile(filepath.Join(a.cfg.UploadDir, name))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": "Profile photo not found"})
+		fail(c, http.StatusNotFound, "Profile photo not found")
 		return
 	}
 
@@ -158,7 +165,7 @@ func (a *App) deleteProfilePhoto(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not find profile photo"})
+		fail(c, http.StatusInternalServerError, "Could not find profile photo")
 		return
 	}
 
@@ -166,7 +173,7 @@ func (a *App) deleteProfilePhoto(c *gin.Context) {
 		`UPDATE user_profiles SET photo_file = NULL WHERE user_id = $1`, uid,
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not delete profile photo"})
+		fail(c, http.StatusInternalServerError, "Could not delete profile photo")
 		return
 	}
 

@@ -237,7 +237,8 @@ func (a *App) skinAnalysis(c *gin.Context) {
 	if fromVideo {
 		imgs, err := videoFrames(ctx, videos[0], aiMaxFrames)
 		if err != nil {
-			fail(c, http.StatusBadRequest, err.Error())
+			log.Printf("video frames: %v", err)
+			fail(c, http.StatusBadRequest, aiClientMsg(err))
 			return
 		}
 		images = imgs

@@ -63,9 +63,7 @@ class ApiClient {
     }
     http.Response res;
     try {
-      res = await http.Response.fromStream(
-        await _http.send(req).timeout(timeout),
-      );
+      res = await (() async => http.Response.fromStream(await _http.send(req)))().timeout(timeout);
     } on TimeoutException {
       throw ApiException('The server took too long to respond.');
     } catch (_) {

@@ -25,6 +25,7 @@ class ProfilePhotoStore extends ChangeNotifier {
   Uint8List? bytes;
   bool loaded = false;
   bool busy = false;
+  int _retries = 0;
 
   Map<String, String> get _auth {
     final t = Session.I.token;
@@ -51,6 +52,10 @@ class ProfilePhotoStore extends ChangeNotifier {
           : null;
     } catch (_) {
       bytes = null;
+      if (_retries < 3 && Session.I.token == startToken) {
+        _retries++;
+        Future.delayed(const Duration(seconds: 20), load);
+      }
     }
     notifyListeners();
   }
