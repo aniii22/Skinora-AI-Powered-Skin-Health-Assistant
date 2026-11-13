@@ -42,3 +42,7 @@ _lang/
 *.mine
 *.new
 mobile/android/build/
+
+.env
+*.env.bak*
+backup_fix*/
