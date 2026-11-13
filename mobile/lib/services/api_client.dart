@@ -27,7 +27,8 @@ class ApiClient {
           baseUrl ??
           const String.fromEnvironment(
             'API_BASE_URL',
-            defaultValue: 'http://192.168.1.13:8081',
+            defaultValue:
+                'https://skinora-ai-powered-skin-health-assistant.onrender.com',
           );
 
   final http.Client _http;
@@ -56,7 +57,8 @@ class ApiClient {
   }) async {
     final token = Session.I.token;
     if (token != null) req.headers['Authorization'] = 'Bearer $token';
-    if (req is http.MultipartRequest && req.url.path.endsWith('/ai/skin-analysis')) {
+    if (req is http.MultipartRequest &&
+        req.url.path.endsWith('/ai/skin-analysis')) {
       req.fields['lang'] = Lang.I.code;
     }
     http.Response res;
@@ -345,8 +347,8 @@ class ApiClient {
     }
     if (note != null && note.trim().isNotEmpty) {
       req.fields['note'] = note.trim();
-    req.fields['lang'] = Lang.I.code;
     }
+    req.fields['lang'] = Lang.I.code;
     return _map(await _finish(req, timeout: const Duration(seconds: 150)));
   }
 

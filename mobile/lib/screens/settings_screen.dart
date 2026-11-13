@@ -1,5 +1,4 @@
 import 'reminders_screen.dart';
-import 'reminders_screen.dart';
 import 'package:flutter/material.dart' hide Text;
 
 import '../l10n/l10n.dart';

@@ -49,7 +49,7 @@ func (a *App) uploadProfilePhoto(c *gin.Context) {
 		case "image/gif":
 		ext = ".gif"
 		default:
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Only JPEG and PNG images are supported"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Only JPEG, PNG, WebP and GIF images are supported"})
 		return
 	}
 
@@ -115,7 +115,7 @@ func (a *App) getProfilePhoto(c *gin.Context) {
 	var storedPath string
 
 	err := a.db.QueryRow(c.Request.Context(),
-		`SELECT photo_file FROM user_profiles WHERE user_id = $1`,
+		`SELECT COALESCE(photo_file, '') FROM user_profiles WHERE user_id = $1`,
 		curUser(c).ID,
 	).Scan(&storedPath)
 
@@ -149,7 +149,7 @@ func (a *App) deleteProfilePhoto(c *gin.Context) {
 	var storedPath string
 
 	err := a.db.QueryRow(c.Request.Context(),
-		`SELECT photo_file FROM user_profiles WHERE user_id = $1`,
+		`SELECT COALESCE(photo_file, '') FROM user_profiles WHERE user_id = $1`,
 		uid,
 	).Scan(&storedPath)
 

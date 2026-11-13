@@ -97,7 +97,7 @@ class RoutineScreen extends StatelessWidget {
               Text(
                 total == 0
                     ? 'Add a step to get started'
-                    : '$pct% complete  •  ${Session.I.user?.isPremium == true ? '$total steps' : '$total / 3 steps (free plan)'}',
+                    : '$pct% complete  •  ${Session.I.user?.isPremium == true ? '$total steps' : '$total / 6 steps (free plan)'}',
                 style: AppText.caption,
               ),
             ],
@@ -259,10 +259,10 @@ class RoutineScreen extends StatelessWidget {
     AppState s,
     String period,
   ) async {
-    if (Session.I.user?.isPremium != true && s.routine.length >= 3) {
+    if (Session.I.user?.isPremium != true && s.routine.length >= 6) {
       showPremiumDialog(
         context,
-        'Premium: the free plan allows up to 3 routine steps. Upgrade for unlimited steps.',
+        'Premium: the free plan allows up to 6 routine steps. Upgrade for unlimited steps.',
       );
       return;
     }

@@ -244,7 +244,7 @@ func (a *App) createRoutineItem(c *gin.Context) {
 			return
 		}
 		if n >= freeRoutineLimit {
-			premiumRequired(c, "the free plan allows up to 3 routine steps. Upgrade for unlimited steps.")
+			premiumRequired(c, "the free plan allows up to 6 routine steps. Upgrade for unlimited steps.")
 			return
 		}
 	}

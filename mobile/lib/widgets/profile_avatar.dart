@@ -253,11 +253,21 @@ Future<void> showPhotoSheet(BuildContext context) async {
   );
   String? err;
   if (action == 'pick') {
-    final f = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1024,
-      imageQuality: 85,
-    );
+    XFile? f;
+    try {
+      f = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        imageQuality: 85,
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Could not open your photo library. Check photo permission and try again.'),
+        ),
+      );
+      return;
+    }
     if (f == null) return;
     err = await store.upload(f);
   } else if (action == 'remove') {

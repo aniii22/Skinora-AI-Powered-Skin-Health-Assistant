@@ -9,7 +9,6 @@ import 'services/local_notifier.dart';
 import 'state/app_state.dart';
 import 'theme/app_theme.dart';
 import 'theme/pointer_cursors.dart';
-import 'theme/pointer_cursors.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
