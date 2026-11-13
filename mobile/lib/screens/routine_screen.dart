@@ -53,8 +53,18 @@ class RoutineScreen extends StatelessWidget {
   }
 
   Widget _content(BuildContext context, AppState s) {
-    final total = s.routine.length;
-    final done = s.routine.where((r) => r.done).length;
+    final past = _isPastSelected;
+    final sel = selectedRoutineDay.value;
+    RoutineDay? pastDay;
+    if (past) {
+      for (final d in s.routineHistory) {
+        if (d.day.year == sel.year && d.day.month == sel.month && d.day.day == sel.day) {
+          pastDay = d;
+        }
+      }
+    }
+    final total = past ? (pastDay?.total ?? 0) : s.routine.length;
+    final done = past ? (pastDay?.completed ?? 0) : s.routine.where((r) => r.done).length;
     final pct = total == 0 ? 0 : (done / total * 100).round();
     final hasHistory = s.routineHistory.any((d) => d.completed > 0);
 
@@ -81,7 +91,7 @@ class RoutineScreen extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      "Today's progress",
+                      past ? 'Progress on ${dayLabel(sel)}' : "Today's progress",
                       style: AppText.cardTitle.copyWith(fontSize: 16),
                     ),
                   ),
@@ -96,7 +106,7 @@ class RoutineScreen extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 total == 0
-                    ? 'Add a step to get started'
+                    ? (past ? 'No data for this day' : 'Add a step to get started')
                     : '$pct% complete  •  ${Session.I.user?.isPremium == true ? '$total steps' : '$total / 6 steps (free plan)'}',
                 style: AppText.caption,
               ),
@@ -163,6 +173,7 @@ class RoutineScreen extends StatelessWidget {
     String title,
     IconData icon,
   ) {
+    if (_isPastSelected) return const SizedBox.shrink();
     final items = s.routine.where((r) => r.period == period).toList();
     final done = items.where((r) => r.done).length;
     return AppSurface(
