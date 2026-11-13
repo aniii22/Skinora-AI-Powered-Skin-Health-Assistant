@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -57,6 +59,12 @@ class ApiClient {
   }) async {
     final token = Session.I.token;
     if (token != null) req.headers['Authorization'] = 'Bearer $token';
+    if (!kIsWeb) {
+      final zone = await _deviceTz();
+      if (zone != null && zone.isNotEmpty) {
+        req.headers['X-Timezone'] = zone;
+      }
+    }
     if (req is http.MultipartRequest &&
         req.url.path.endsWith('/ai/skin-analysis')) {
       req.fields['lang'] = Lang.I.code;
@@ -377,4 +385,14 @@ class ApiClient {
       );
   Future<void> clearAllData() =>
       _send('DELETE', '/api/data', query: {'confirm': 'delete-all'});
+}
+
+String? _tzName;
+
+Future<String?> _deviceTz() async {
+  if (_tzName != null) return _tzName;
+  try {
+    _tzName = await FlutterTimezone.getLocalTimezone();
+  } catch (_) {}
+  return _tzName;
 }

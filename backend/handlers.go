@@ -647,8 +647,8 @@ func (a *App) createSleep(c *gin.Context) {
 	}
 	var dup bool
 	if err := a.db.QueryRow(c.Request.Context(),
-		`SELECT EXISTS (SELECT 1 FROM sleep_logs WHERE user_id = $1 AND wake_time::date = $2::timestamptz::date)`,
-		curUser(c).ID, in.WakeTime).Scan(&dup); err != nil {
+		`SELECT EXISTS (SELECT 1 FROM sleep_logs WHERE user_id = $1 AND (wake_time AT TIME ZONE COALESCE(NULLIF($3::text,''), current_setting('TimeZone')))::date = ($2::timestamptz AT TIME ZONE COALESCE(NULLIF($3::text,''), current_setting('TimeZone')))::date)`,
+		curUser(c).ID, in.WakeTime, reqTZ(c)).Scan(&dup); err != nil {
 		serverError(c, err)
 		return
 	}
@@ -682,8 +682,8 @@ func (a *App) updateSleep(c *gin.Context) {
 	}
 	var dup bool
 	if err := a.db.QueryRow(c.Request.Context(),
-		`SELECT EXISTS (SELECT 1 FROM sleep_logs WHERE user_id = $1 AND id <> $3 AND wake_time::date = $2::timestamptz::date)`,
-		curUser(c).ID, in.WakeTime, id).Scan(&dup); err != nil {
+		`SELECT EXISTS (SELECT 1 FROM sleep_logs WHERE user_id = $1 AND id <> $3 AND (wake_time AT TIME ZONE COALESCE(NULLIF($4::text,''), current_setting('TimeZone')))::date = ($2::timestamptz AT TIME ZONE COALESCE(NULLIF($4::text,''), current_setting('TimeZone')))::date)`,
+		curUser(c).ID, in.WakeTime, id, reqTZ(c)).Scan(&dup); err != nil {
 		serverError(c, err)
 		return
 	}
@@ -776,8 +776,8 @@ func (a *App) listJournal(c *gin.Context) {
 	limit := intQuery(c, "limit", 50, 1, 200)
 	offset := intQuery(c, "offset", 0, 0, 100000)
 	rows, err := a.db.Query(c.Request.Context(),
-		`SELECT `+journalCols+` FROM journal_entries WHERE user_id = $1 AND ($4::bool OR day >= current_date - 1) ORDER BY day DESC, id DESC LIMIT $2 OFFSET $3`,
-		curUser(c).ID, limit, offset, curUser(c).premium())
+		`SELECT `+journalCols+` FROM journal_entries WHERE user_id = $1 AND ($4::bool OR day >= (now() AT TIME ZONE COALESCE(NULLIF($5::text,''), current_setting('TimeZone')))::date - 1) ORDER BY day DESC, id DESC LIMIT $2 OFFSET $3`,
+		curUser(c).ID, limit, offset, curUser(c).premium(), reqTZ(c))
 	if err != nil {
 		serverError(c, err)
 		return
@@ -1059,8 +1059,8 @@ func (a *App) insights(c *gin.Context) {
 	var sleepAvg float64
 	if err := a.db.QueryRow(ctx, `
 		SELECT COUNT(*)::int, COALESCE(AVG(EXTRACT(EPOCH FROM (wake_time - sleep_start)) / 60), 0)::float8
-		FROM sleep_logs WHERE user_id = $3 AND wake_time::date BETWEEN $1::date AND $2::date`,
-		from, to, u.ID).Scan(&sleepCount, &sleepAvg); err != nil {
+		FROM sleep_logs WHERE user_id = $3 AND (wake_time AT TIME ZONE COALESCE(NULLIF($4::text,''), current_setting('TimeZone')))::date BETWEEN $1::date AND $2::date`,
+		from, to, u.ID, reqTZ(c)).Scan(&sleepCount, &sleepAvg); err != nil {
 		serverError(c, err)
 		return
 	}

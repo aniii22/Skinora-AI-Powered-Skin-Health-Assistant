@@ -20,7 +20,7 @@ func (a *App) journalLimit() gin.HandlerFunc {
 		var n int
 		err := a.db.QueryRow(c.Request.Context(),
 			`SELECT COUNT(*)::int FROM journal_entries
- WHERE user_id = $1 AND created_at >= date_trunc('month', now())`, u.ID).Scan(&n)
+ WHERE user_id = $1 AND created_at >= date_trunc('month', now() AT TIME ZONE COALESCE(NULLIF($2::text,''), current_setting('TimeZone'))) AT TIME ZONE COALESCE(NULLIF($2::text,''), current_setting('TimeZone'))`, u.ID, reqTZ(c)).Scan(&n)
 		if err != nil {
 			serverError(c, err)
 			c.Abort()

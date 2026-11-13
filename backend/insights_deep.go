@@ -64,10 +64,10 @@ func (a *App) deepInsights(c *gin.Context) {
 
 	sleepMin := map[string]int{}
 	srows, err := a.db.Query(ctx, `
-SELECT wake_time::date, AVG(EXTRACT(EPOCH FROM (wake_time - sleep_start)) / 60)::int
+SELECT (wake_time AT TIME ZONE COALESCE(NULLIF($4::text,''), current_setting('TimeZone')))::date, AVG(EXTRACT(EPOCH FROM (wake_time - sleep_start)) / 60)::int
 FROM sleep_logs
-WHERE user_id = $3 AND wake_time::date BETWEEN $1::date AND $2::date
-GROUP BY 1`, from, to, u.ID)
+WHERE user_id = $3 AND (wake_time AT TIME ZONE COALESCE(NULLIF($4::text,''), current_setting('TimeZone')))::date BETWEEN $1::date AND $2::date
+GROUP BY 1`, from, to, u.ID, reqTZ(c))
 	if err != nil {
 		serverError(c, err)
 		return
