@@ -17,27 +17,7 @@ class AccountSection extends StatefulWidget {
 class _AccountSectionState extends State<AccountSection> {
   bool _busy = false;
 
-  Future<void> _cancel() async {
-    if (_busy) return;
-    final ok = await confirmDialog(
-      context,
-      title: 'Cancel Premium?',
-      message:
-          'You will lose unlimited routine steps, progress photos and 14/30 day '
-          'insights right away. Your data is kept.',
-      confirmLabel: 'Cancel Premium',
-    );
-    if (!ok || !mounted) return;
-    setState(() => _busy = true);
-    try {
-      await Session.I.cancelPremium();
-      if (mounted) showSnack(context, 'Premium cancelled');
-    } catch (e) {
-      if (mounted) handleApiError(context, e);
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
+  
 
   Future<void> _signOut() async {
     final ok = await confirmDialog(
