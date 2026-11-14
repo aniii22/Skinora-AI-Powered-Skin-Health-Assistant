@@ -307,7 +307,9 @@ class _CompareCardState extends State<_CompareCard> {
 
     final before = photos.last;
     final after = photos.first;
-    final days = after.day.difference(before.day).inDays;
+    final days = DateTime.utc(after.day.year, after.day.month, after.day.day)
+        .difference(DateTime.utc(before.day.year, before.day.month, before.day.day))
+        .inDays;
 
     return AppSurface(
       child: Column(
