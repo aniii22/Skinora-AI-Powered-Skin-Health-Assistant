@@ -160,7 +160,7 @@ class _PersonalPlanCardState extends State<PersonalPlanCard> {
   RoutineItem? _find(AppState s, RoutineStep st) {
     final title = st.title.trim().toLowerCase();
     for (final r in s.routine) {
-      if (r.title.trim().toLowerCase() == title) return r;
+      if (r.title.trim().toLowerCase() == title && r.period == st.period) return r;
     }
     return null;
   }
@@ -171,7 +171,7 @@ class _PersonalPlanCardState extends State<PersonalPlanCard> {
       if (!_persist(st)) return false;
       final t = st.title.trim().toLowerCase();
       for (final r in _pastItems) {
-        if (r.title.trim().toLowerCase() == t) return r.done;
+        if (r.title.trim().toLowerCase() == t && r.period == st.period) return r.done;
       }
       return false;
     }
