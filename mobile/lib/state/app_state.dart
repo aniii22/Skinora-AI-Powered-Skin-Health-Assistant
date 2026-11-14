@@ -280,7 +280,10 @@ class AppState extends ChangeNotifier {
   }
 
   Future<String?> addWater(int ml) async {
-    if ((water?.totalMl ?? 0) + ml > 5000) return 'Daily limit reached (5000 ml)';
+    if ((water?.totalMl ?? 0) + ml > 5000) {
+      notifyListeners();
+      return 'Daily limit reached (5000 ml)';
+    }
     return _run(() async {
       await api.addWater(todayKey, ml);
       await _reloadWater();
