@@ -37,6 +37,7 @@ class AppState extends ChangeNotifier {
   String? loadError;
   String _loadedDay = '';
   DateTime? _lastLoadedAt;
+  int _gen = 0; // bumps on sign-out and sign-in, so late results of the old user are dropped
 
   // data
   SkinProfile profile = SkinProfile.empty;
@@ -54,6 +55,7 @@ class AppState extends ChangeNotifier {
 
   /// Clears all data (used on sign-out / before a new sign-in).
   void reset() {
+    _gen++;
     loaded = false;
     loading = false;
     loadError = null;
@@ -110,6 +112,7 @@ class AppState extends ChangeNotifier {
   Future<void> loadAll() async {
     if (loading) return;
     loading = true;
+    final gen = _gen;
     loadError = null;
     notifyListeners();
     final day = todayKey;
@@ -132,6 +135,7 @@ class AppState extends ChangeNotifier {
       final wh = res[5];
       final s = res[6];
       final j = res[7];
+      if (gen != _gen) return;
       profile = p;
       settings = st;
       routine = r;
@@ -148,11 +152,11 @@ class AppState extends ChangeNotifier {
       _lastLoadedAt = DateTime.now();
       _syncSmartReminders();
     } on ApiException catch (e) {
-      loadError = e.message;
+      if (gen == _gen) loadError = e.message;
     } catch (_) {
-      loadError = 'Unexpected response from the server.';
+      if (gen == _gen) loadError = 'Unexpected response from the server.';
     } finally {
-      loading = false;
+      if (gen == _gen) loading = false;
       notifyListeners();
     }
   }
@@ -218,11 +222,13 @@ class AppState extends ChangeNotifier {
 
   // ---- routine ----
   Future<void> _reloadRoutine() async {
+    final gen = _gen;
     final day = todayKey;
     final res = await Future.wait<dynamic>([
       api.listRoutine(day),
       api.routineHistory(7, day),
     ], eagerError: true);
+    if (gen != _gen) return;
     routine = res[0];
     routineHistory = res[1];
   }
@@ -262,11 +268,13 @@ class AppState extends ChangeNotifier {
 
   // ---- water ----
   Future<void> _reloadWater() async {
+    final gen = _gen;
     final day = todayKey;
     final res = await Future.wait<dynamic>([
       api.waterSummary(day),
       api.waterHistory(7, day),
     ], eagerError: true);
+    if (gen != _gen) return;
     water = res[0];
     waterHistory = res[1];
   }
