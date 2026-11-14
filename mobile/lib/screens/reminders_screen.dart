@@ -75,10 +75,15 @@ String _daysLabel(int m) {
 String _hhmm(TimeOfDay t) =>
     '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
 
-TimeOfDay _parse(String s) => TimeOfDay(
-  hour: int.tryParse(s.substring(0, 2)) ?? 0,
-  minute: int.tryParse(s.substring(3, 5)) ?? 0,
-);
+int _part(String s, int i, int max) {
+  final p = s.split(':');
+  final v = i < p.length ? int.tryParse(p[i].trim()) : null;
+  if (v == null || v < 0) return 0;
+  return v > max ? max : v;
+}
+
+TimeOfDay _parse(String s) =>
+    TimeOfDay(hour: _part(s, 0, 23), minute: _part(s, 1, 59));
 
 class RemindersScreen extends StatefulWidget {
   const RemindersScreen({super.key});
@@ -165,7 +170,11 @@ class _RemindersScreenState extends State<RemindersScreen> {
       context: context,
       initialTime: _parse(start ? _qs : _qe),
     );
-    if (t == null) return;
+    if (t == null || !mounted) return;
+    if (_hhmm(t) == (start ? _qe : _qs)) {
+      showSnack(context, 'Quiet hours start and end cannot be the same.', error: true);
+      return;
+    }
     setState(() {
       if (start) {
         _qs = _hhmm(t);
