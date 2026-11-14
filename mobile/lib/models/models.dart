@@ -72,7 +72,7 @@ class WaterSettings {
   const WaterSettings({required this.goalMl, required this.glassMl});
   final int goalMl;
   final int glassMl;
-  static const defaults = WaterSettings(goalMl: 2000, glassMl: 250);
+  static const defaults = WaterSettings(goalMl: 5000, glassMl: 250);
 
   factory WaterSettings.fromJson(Map<String, dynamic> j) => WaterSettings(
     goalMl: (j['water_goal_ml'] as num).toInt(),
