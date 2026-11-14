@@ -653,7 +653,7 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
       _busy = true;
       _error = null;
     });
-    dynamic r;
+    SaveOutcome r;
     try {
       r = await AppScope.read(context).saveJournal(
         id: widget.existing?.id,
