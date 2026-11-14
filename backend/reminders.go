@@ -361,13 +361,18 @@ func (a *App) fireDueReminders() {
 		local := now.Add(time.Duration(d.off) * time.Minute)
 		nowMin := local.Hour()*60 + local.Minute()
 		rMin := minutesOf(d.tod)
-		if nowMin < rMin || nowMin-rMin > 5 {
+		due, prevDay := dueWindow(nowMin, rMin)
+		sched := local
+		if prevDay {
+			sched = local.AddDate(0, 0, -1) // seen after midnight: belongs to yesterday
+		}
+		if !due {
 			continue
 		}
-		if d.days&(1<<((int(local.Weekday())+6)%7)) == 0 {
+		if d.days&(1<<((int(sched.Weekday())+6)%7)) == 0 {
 			continue
 		}
-		today := time.Date(local.Year(), local.Month(), local.Day(), 0, 0, 0, 0, time.UTC)
+		today := time.Date(sched.Year(), sched.Month(), sched.Day(), 0, 0, 0, 0, time.UTC)
 		if d.last != nil && d.last.Format("2006-01-02") == today.Format("2006-01-02") {
 			continue
 		}
