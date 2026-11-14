@@ -294,7 +294,7 @@ class RingDashboard extends StatelessWidget {
   }
 }
 
-/// Monday-Sunday strip. Tap a day to see its plan, checks and thought.
+/// Last 7 days (ending today). Tap a day to see its plan, checks and thought.
 class WeekStrip extends StatelessWidget {
   const WeekStrip({super.key});
 
@@ -304,7 +304,8 @@ class WeekStrip extends StatelessWidget {
 
   static bool _locked(DateTime d) {
     if (Session.I.user?.isPremium == true) return false;
-    return _d(DateTime.now()).difference(_d(d)).inDays > 1;
+    final n = DateTime.now();
+    return DateTime.utc(n.year, n.month, n.day).difference(DateTime.utc(d.year, d.month, d.day)).inDays > 1;
   }
 
   void _pick(BuildContext context, DateTime d) {
@@ -322,7 +323,9 @@ class WeekStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final monday = _d(now).subtract(Duration(days: now.weekday - 1));
+    final days = [
+      for (var i = 0; i < 7; i++) DateTime(now.year, now.month, now.day - 6 + i),
+    ];
     final names = weekdayNames();
     return ListenableBuilder(
       listenable: Listenable.merge([selectedRoutineDay, Session.I]),
@@ -336,8 +339,8 @@ class WeekStrip extends StatelessWidget {
               Expanded(
                 child: _day(
                   context,
-                  monday.add(Duration(days: i)),
-                  names[i],
+                  days[i],
+                  names[days[i].weekday - 1],
                   now,
                   sel,
                 ),
