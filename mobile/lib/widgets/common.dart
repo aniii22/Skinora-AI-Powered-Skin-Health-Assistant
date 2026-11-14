@@ -5,8 +5,15 @@ import '../l10n/l10n.dart';
 import '../state/app_state.dart';
 import '../theme/app_theme.dart';
 
-void openScreen(BuildContext context, Widget screen) =>
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => screen));
+DateTime _lastOpen = DateTime.fromMillisecondsSinceEpoch(0);
+
+/// Ignores a second tap that arrives while the first screen is still opening.
+Future<void> openScreen(BuildContext context, Widget screen) async {
+  final now = DateTime.now();
+  if (now.difference(_lastOpen) < const Duration(milliseconds: 700)) return;
+  _lastOpen = now;
+    await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => screen));
+}
 
 void showSnack(BuildContext context, String message, {bool error = false}) {
   ScaffoldMessenger.of(context)
