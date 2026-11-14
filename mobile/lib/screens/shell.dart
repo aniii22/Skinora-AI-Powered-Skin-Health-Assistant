@@ -51,12 +51,17 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  DateTime _lastScanTap = DateTime.fromMillisecondsSinceEpoch(0);
+
   void _go(int i) => setState(() => _index = i);
 
   // Bottom bar slot 2 opens AI Skin Scan on top of the shell. Water keeps
   // page index 2, so the Hydration card on Home can still switch to it.
   void _onNavTap(int i) {
     if (i == 2) {
+      final now = DateTime.now();
+      if (now.difference(_lastScanTap) < const Duration(milliseconds: 700)) return;
+      _lastScanTap = now;
       Navigator.of(
         context,
       ).push(MaterialPageRoute<void>(builder: (_) => const SkinScanScreen()));
