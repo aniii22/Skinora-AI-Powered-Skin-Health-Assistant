@@ -411,6 +411,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                       ? null
                                       : () => setState(() {
                                           _register = !_register;
+      _pass.clear();
                                           _error = null;
                                         }),
                                   child: Text(
