@@ -19,6 +19,7 @@ class LocalNotifier {
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
   bool _ready = false;
+  Future<void>? _initFuture;
   bool _syncing = false;
 
   bool get supported =>
@@ -34,7 +35,9 @@ class LocalNotifier {
     ),
   );
 
-  Future<void> init() async {
+  Future<void> init() => _initFuture ??= _init();
+
+  Future<void> _init() async {
     if (!supported || _ready) return;
     try {
       tzdata.initializeTimeZones();
@@ -52,6 +55,7 @@ class LocalNotifier {
       _ready = true;
     } catch (e) {
       debugPrint('LocalNotifier init failed: $e');
+      _initFuture = null; // allow a retry
     }
   }
 

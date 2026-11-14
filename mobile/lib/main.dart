@@ -13,8 +13,9 @@ import 'theme/pointer_cursors.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Session.I.init();
-  await LocalNotifier.I.init();
+  // Notifications start after the first frame, so the permission prompt cannot block startup.
   runApp(const SkinoraApp());
+  WidgetsBinding.instance.addPostFrameCallback((_) => LocalNotifier.I.init());
 }
 
 class SkinoraApp extends StatefulWidget {
