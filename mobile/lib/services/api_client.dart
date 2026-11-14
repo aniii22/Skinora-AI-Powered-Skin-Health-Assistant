@@ -11,6 +11,9 @@ import '../auth/session.dart' show Session;
 import '../models/models.dart';
 import '../l10n/l10n.dart';
 
+/// One HTTP client for the whole app, so connections are reused.
+final http.Client _sharedHttp = http.Client();
+
 class ApiException implements Exception {
   ApiException(this.message, [this.status]);
   final String message;
@@ -24,7 +27,7 @@ class ApiException implements Exception {
 /// Base URL: flutter run --dart-define=API_BASE_URL=https://your-api.example.com
 class ApiClient {
   ApiClient({http.Client? client, String? baseUrl})
-    : _http = client ?? http.Client(),
+    : _http = client ?? _sharedHttp,
       baseUrl =
           baseUrl ??
           const String.fromEnvironment(
