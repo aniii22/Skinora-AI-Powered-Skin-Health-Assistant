@@ -97,6 +97,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
   List<Reminder> _items = [];
   bool _all = true, _quiet = false;
   String _qs = '22:00', _qe = '07:00';
+  final Set<int> _toggling = {}; // reminders whose switch is saving right now
 
   @override
   void initState() {
@@ -186,6 +187,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
   }
 
   Future<void> _toggle(Reminder r, bool v) async {
+    if (!_toggling.add(r.id)) return; // ignore taps while this switch is saving
     try {
       await _api.request(
         'PUT',
@@ -201,6 +203,8 @@ class _RemindersScreenState extends State<RemindersScreen> {
       await _load(silent: true);
     } on ApiException catch (e) {
       if (mounted) showSnack(context, e.message, error: true);
+    } finally {
+      _toggling.remove(r.id);
     }
   }
 
