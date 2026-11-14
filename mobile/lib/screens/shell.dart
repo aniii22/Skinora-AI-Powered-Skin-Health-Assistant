@@ -103,13 +103,17 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
                 fit: BoxFit.contain,
               ),
               const SizedBox(width: 9),
-              const Text(
-                'Skinora',
-                style: TextStyle(
-                  color: AppColors.deep,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 24,
-                  letterSpacing: -0.6,
+              const Flexible(
+                child: Text(
+                  'Skinora',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppColors.deep,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 24,
+                    letterSpacing: -0.6,
+                  ),
                 ),
               ),
               if (wide) ...[
