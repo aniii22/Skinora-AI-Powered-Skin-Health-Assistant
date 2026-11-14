@@ -542,7 +542,7 @@ class _SkinScanScreenState extends State<SkinScanScreen> {
               style: TextStyle(fontSize: 12, color: Color(0xFF81778F)),
             ),
             const SizedBox(height: 12),
-            _ProblemChips(controller: _note),
+            _ProblemChips(controller: _note, enabled: !_busy),
             const SizedBox(height: 22),
             TextField(
               controller: _note,
@@ -926,9 +926,10 @@ class _SkinScanScreenState extends State<SkinScanScreen> {
 /// Tap = adds the problem once. Tap again = removes it. The state is read
 /// from the text box itself, so it can never be added twice.
 class _ProblemChips extends StatelessWidget {
-  const _ProblemChips({required this.controller});
+  const _ProblemChips({required this.controller, this.enabled = true});
 
   final TextEditingController controller;
+  final bool enabled;
 
   static const _options = [
     'Acne',
@@ -988,7 +989,7 @@ class _ProblemChips extends StatelessWidget {
                       ? const Color(0xFF4A1D5C)
                       : const Color(0xFFE6D9C0),
                 ),
-                onSelected: (v) => _toggle(o, v),
+                onSelected: enabled ? (v) => _toggle(o, v) : null,
               ),
           ],
         );
