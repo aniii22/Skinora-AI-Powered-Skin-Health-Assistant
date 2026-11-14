@@ -16,6 +16,8 @@ Future<void> main() async {
   // Notifications start after the first frame, so the permission prompt cannot block startup.
   runApp(const SkinoraApp());
   WidgetsBinding.instance.addPostFrameCallback((_) => LocalNotifier.I.init());
+  // Wake a sleeping server while the user is still typing the login details.
+  ApiClient().request('GET', '/api/health').catchError((_) => null);
 }
 
 class SkinoraApp extends StatefulWidget {
