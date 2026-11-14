@@ -16,7 +16,23 @@ import '../theme/app_theme.dart';
 
 /// Product types suggested by the last scan in this app session. They are sent
 /// with the next scan so the AI does not simply repeat itself.
-List<String> _lastProductTypes = <String>[];
+List<String> _productTypesStore = <String>[];
+String? _productTypesOwner;
+
+/// Kept per account: a different sign-in starts with an empty list.
+List<String> get _lastProductTypes {
+  final who = Session.I.user?.email;
+  if (_productTypesOwner != who) {
+    _productTypesOwner = who;
+    _productTypesStore = <String>[];
+  }
+  return _productTypesStore;
+}
+
+set _lastProductTypes(List<String> v) {
+  _productTypesOwner = Session.I.user?.email;
+  _productTypesStore = v;
+}
 
 class _Pic {
   _Pic(this.file, this.bytes);
@@ -935,6 +951,7 @@ class _ProblemChips extends StatelessWidget {
     parts.removeWhere((p) => p.toLowerCase() == key);
     if (on) parts.add(label);
     final text = parts.join(', ');
+    if (on && text.length > 300) return; // keep the note within its 300 character limit
     controller.value = TextEditingValue(
       text: text,
       selection: TextSelection.collapsed(offset: text.length),
