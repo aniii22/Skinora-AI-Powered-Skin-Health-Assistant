@@ -245,7 +245,7 @@ class _PromoCarouselState extends State<PromoCarousel> {
       if (!mounted || !_ctrl.hasClients) return;
       final n = _promos().length;
       _ctrl.animateToPage(
-        (_page + 1) % n,
+        ((_page >= n ? 0 : _page) + 1) % n,
         duration: const Duration(milliseconds: 450),
         curve: Curves.easeInOut,
       );
@@ -262,6 +262,7 @@ class _PromoCarouselState extends State<PromoCarousel> {
   @override
   Widget build(BuildContext context) {
     final promos = _promos();
+    final page = _page >= promos.length ? 0 : _page;
     return Column(
       children: [
         SizedBox(
@@ -284,10 +285,10 @@ class _PromoCarouselState extends State<PromoCarousel> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 margin: const EdgeInsets.symmetric(horizontal: 3),
-                width: i == _page ? 20 : 7,
+                width: i == page ? 20 : 7,
                 height: 7,
                 decoration: BoxDecoration(
-                  color: i == _page ? AppColors.primary : AppColors.border,
+                  color: i == page ? AppColors.primary : AppColors.border,
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
