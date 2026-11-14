@@ -136,7 +136,6 @@ var schemaStatements = []string{
 	`ALTER TABLE user_settings DROP CONSTRAINT IF EXISTS user_settings_water_goal_ml_check`,
 	`ALTER TABLE user_settings DROP CONSTRAINT IF EXISTS user_settings_water_goal_range`,
 	`ALTER TABLE user_settings ADD CONSTRAINT user_settings_water_goal_range CHECK (water_goal_ml BETWEEN 500 AND 5000)`,
-	`UPDATE user_settings SET water_goal_ml = 5000 WHERE water_goal_ml = 2000`,
 	`UPDATE user_settings SET water_goal_ml = 5000 WHERE water_goal_ml > 5000`,
 	`DROP TABLE IF EXISTS skin_profile`,
 	`DROP TABLE IF EXISTS app_settings`,
