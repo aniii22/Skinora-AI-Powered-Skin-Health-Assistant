@@ -54,10 +54,7 @@ class _AccountSectionState extends State<AccountSection> {
                   Row(
                     children: [
                       const Text('Plan: ', style: AppText.body),
-                      if (u.isPremium)
-                        const SizedBox.shrink()
-                      else
-                        const Text('Free', style: AppText.cardTitle),
+                      Text(u.isPremium ? 'Premium' : 'Free', style: AppText.cardTitle),
                     ],
                   ),
                   if (u.isPremium) ...[
