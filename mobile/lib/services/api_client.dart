@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -76,7 +76,8 @@ class ApiClient {
       ))().timeout(timeout);
     } on TimeoutException {
       throw ApiException('The server took too long to respond.');
-    } catch (_) {
+    } catch (e) {
+      debugPrint('API request failed: ${req.method} ${req.url.path} - $e');
       throw ApiException(
         'Could not reach the server at $baseUrl. Make sure the backend is running, then try again.',
       );
