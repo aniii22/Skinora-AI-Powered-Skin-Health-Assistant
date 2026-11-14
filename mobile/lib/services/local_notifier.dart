@@ -12,6 +12,10 @@ class LocalNotifier {
   LocalNotifier._();
   static final LocalNotifier I = LocalNotifier._();
 
+  /// Notification ids from here up belong to SmartReminders and test pings.
+  /// Server reminders use id * 10 + weekday and must stay below this.
+  static const smartBase = 1500000000;
+
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
   bool _ready = false;
@@ -95,7 +99,7 @@ class LocalNotifier {
     final now = tz.TZDateTime.now(tz.local);
     var d = tz.TZDateTime(tz.local, now.year, now.month, now.day, h, m);
     while (d.weekday != weekday || !d.isAfter(now)) {
-      d = d.add(const Duration(days: 1));
+      d = tz.TZDateTime(tz.local, d.year, d.month, d.day + 1, h, m);
     }
     return d;
   }
@@ -116,7 +120,7 @@ class LocalNotifier {
       } catch (_) {}
 
       for (final p in await _plugin.pendingNotificationRequests()) {
-        if (p.id < 1000000) await _plugin.cancel(p.id);
+        if (p.id < smartBase) await _plugin.cancel(p.id);
       }
       if (prefs['all_enabled'] == false) return;
       final quietOn = prefs['quiet_enabled'] == true;
@@ -127,6 +131,7 @@ class LocalNotifier {
         final r = e as Map<String, dynamic>;
         if (r['enabled'] != true) continue;
         final id = (r['id'] as num).toInt();
+        if (id >= smartBase ~/ 10) continue; // would collide with other notification ids
         final kind = r['kind'] as String;
         final time = r['time'] as String;
         final days = (r['days'] as num).toInt();

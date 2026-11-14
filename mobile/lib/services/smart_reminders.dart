@@ -1,7 +1,8 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../auth/session.dart';
 import 'api_client.dart';
 import 'local_notifier.dart';
 
@@ -11,8 +12,9 @@ class SmartReminders {
   SmartReminders._();
   static final SmartReminders I = SmartReminders._();
 
-  static const _base = 1000000; // ids _base.._base+999 belong to this class
+  static const _base = LocalNotifier.smartBase; // ids _base.._base+999 belong to this class
   bool _busy = false;
+  ({ApiClient api, int waterMl, int goalMl, int routineDone, int routineTotal, bool sleepLogged, bool journalLogged})? _queued;
 
   static const _details = NotificationDetails(
     android: AndroidNotificationDetails(
@@ -46,8 +48,14 @@ class SmartReminders {
     required bool sleepLogged,
     required bool journalLogged,
   }) async {
-    if (!LocalNotifier.I.supported || _busy) return;
+    if (!LocalNotifier.I.supported) return;
+    if (_busy) {
+      // Keep the newest request and run it when the current one finishes.
+      _queued = (api: api, waterMl: waterMl, goalMl: goalMl, routineDone: routineDone, routineTotal: routineTotal, sleepLogged: sleepLogged, journalLogged: journalLogged);
+      return;
+    }
     _busy = true;
+    final tokenAtStart = Session.I.token;
     try {
       await LocalNotifier.I.init();
       final plugin = FlutterLocalNotificationsPlugin();
@@ -67,7 +75,7 @@ class SmartReminders {
         qs = (prefs['quiet_start'] as String?) ?? qs;
         qe = (prefs['quiet_end'] as String?) ?? qe;
       } catch (_) {}
-      if (!allEnabled) return;
+      if (!allEnabled || Session.I.token == null || Session.I.token != tokenAtStart) return;
 
       final now = tz.TZDateTime.now(tz.local);
       bool ok(tz.TZDateTime t) =>
@@ -78,7 +86,7 @@ class SmartReminders {
           tz.TZDateTime(tz.local, now.year, now.month, now.day, h, m);
 
       Future<void> put(int id, tz.TZDateTime t, String title, String body) async {
-        if (!ok(t)) return;
+        if (!ok(t) || Session.I.token != tokenAtStart) return;
         await plugin.zonedSchedule(
           _base + id,
           title,
@@ -125,6 +133,11 @@ class SmartReminders {
       debugPrint('SmartReminders failed: $e');
     } finally {
       _busy = false;
+      final q = _queued;
+      _queued = null;
+      if (q != null && Session.I.token != null) {
+        Future.microtask(() => refresh(q.api, waterMl: q.waterMl, goalMl: q.goalMl, routineDone: q.routineDone, routineTotal: q.routineTotal, sleepLogged: q.sleepLogged, journalLogged: q.journalLogged));
+      }
     }
   }
 }
