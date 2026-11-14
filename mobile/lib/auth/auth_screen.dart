@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart' hide Text;
 import 'package:flutter/services.dart';
 
@@ -45,7 +47,9 @@ class _AuthScreenState extends State<AuthScreen> {
   String? _passErr(String? v) {
     final p = v ?? '';
     if (p.isEmpty) return 'Password is required.';
-    if (p.length > 72) return 'Password must be 72 characters or fewer.';
+    if (utf8.encode(p).length > (_register ? 72 : 1024)) {
+      return 'Password is too long. Use at most 72 characters (fewer if it has non-English characters).';
+    }
     if (!_register && p.isNotEmpty) return null;
     if (_passRules(p).containsValue(false)) {
       return 'Password does not meet all requirements.';

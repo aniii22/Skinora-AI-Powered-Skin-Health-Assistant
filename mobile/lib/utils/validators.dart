@@ -1,10 +1,10 @@
-﻿import 'package:flutter/services.dart';
+import 'package:flutter/services.dart';
 
 class Validators {
   // ---- LIMITS ----
   static const int goalMin = 500, goalMax = 5000;
   static const int glassMin = 50, glassMax = 1000;
-  static const int emailMax = 254, passMin = 8, passMax = 64;
+  static const int emailMax = 254, passMin = 8, passMax = 72;
 
   // ---- PATTERNS ----
   static final RegExp _email = RegExp(
