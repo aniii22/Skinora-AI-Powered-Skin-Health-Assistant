@@ -211,6 +211,25 @@ func (a *App) skinAnalysis(c *gin.Context) {
 		return
 	}
 
+	scanID, reserved, rerr := a.reserveAIScan(ctx, u.ID, !u.premium(), limit)
+	if rerr != nil {
+		serverError(c, rerr)
+		return
+	}
+	if !reserved {
+		if u.premium() {
+			fail(c, http.StatusTooManyRequests, "You have used all AI scans for this month.")
+		} else {
+			premiumRequired(c, "you have used your 3 free AI skin scans. Upgrade for 30 scans every month.")
+		}
+		return
+	}
+	scanKept := false
+	defer func() {
+		if !scanKept {
+			a.releaseAIScan(scanID)
+		}
+	}()
 	form, err := c.MultipartForm()
 	if err != nil {
 		fail(c, http.StatusBadRequest, "invalid or too large upload")
@@ -365,9 +384,7 @@ func (a *App) skinAnalysis(c *gin.Context) {
 		an.Disclaimer = "General skincare guidance, not a medical diagnosis."
 	}
 
-	if _, err := a.db.Exec(ctx, `INSERT INTO ai_scans (user_id) VALUES ($1)`, u.ID); err != nil {
-		log.Printf("could not record ai scan: %v", err)
-	}
+	scanKept = true // slot was reserved before the AI call; keep it
 	respond(c, http.StatusOK, gin.H{
 		"analysis":   an,
 		"scans_left": limit - used - 1,
