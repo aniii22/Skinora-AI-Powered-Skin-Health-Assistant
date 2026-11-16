@@ -485,21 +485,36 @@ func (a *App) addWater(c *gin.Context) {
 	}
 	uid := curUser(c).ID
 	ctx := c.Request.Context()
-	var total int
-	if err := a.db.QueryRow(ctx,
-		`SELECT COALESCE(SUM(amount_ml), 0)::int FROM water_logs WHERE user_id = $1 AND day = $2`, uid, day).Scan(&total); err != nil {
-		serverError(c, err)
-		return
-	}
-	if total+in.AmountML > 5000 {
-		fail(c, http.StatusBadRequest, "Daily limit reached (5000 ml)")
-		return
-	}
-	if _, err := a.db.Exec(ctx,
-		`INSERT INTO water_logs (user_id, day, amount_ml) VALUES ($1, $2, $3)`, uid, day, in.AmountML); err != nil {
-		serverError(c, err)
-		return
-	}
+tx, err := a.db.Begin(ctx)
+if err != nil {
+serverError(c, err)
+return
+}
+defer tx.Rollback(ctx)
+// Per-user lock so two parallel requests cannot both pass the 5000 ml check.
+if _, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtextextended('water:'||$1::text, 0))`, uid); err != nil {
+serverError(c, err)
+return
+}
+var total int
+if err := tx.QueryRow(ctx,
+`SELECT COALESCE(SUM(amount_ml), 0)::int FROM water_logs WHERE user_id = $1 AND day = $2`, uid, day).Scan(&total); err != nil {
+serverError(c, err)
+return
+}
+if total+in.AmountML > 5000 {
+fail(c, http.StatusBadRequest, "Daily limit reached (5000 ml)")
+return
+}
+if _, err := tx.Exec(ctx,
+`INSERT INTO water_logs (user_id, day, amount_ml) VALUES ($1, $2, $3)`, uid, day, in.AmountML); err != nil {
+serverError(c, err)
+return
+}
+if err := tx.Commit(ctx); err != nil {
+serverError(c, err)
+return
+}
 	s, err := a.buildWaterSummary(ctx, uid, day)
 	if err != nil {
 		serverError(c, err)
