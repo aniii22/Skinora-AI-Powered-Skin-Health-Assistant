@@ -195,23 +195,7 @@ func (a *App) skinAnalysis(c *gin.Context) {
 	if u.premium() {
 		limit = aiPremiumScansMon
 	}
-	var used int
-	if err := a.db.QueryRow(ctx,
-		`SELECT COUNT(*)::int FROM ai_scans WHERE user_id = $1 AND ($2::bool OR created_at >= date_trunc('month', now()))`,
-		u.ID, !u.premium()).Scan(&used); err != nil {
-		serverError(c, err)
-		return
-	}
-	if used >= limit {
-		if u.premium() {
-			fail(c, http.StatusTooManyRequests, "You have used all AI scans for this month.")
-		} else {
-			premiumRequired(c, "you have used your 3 free AI skin scans. Upgrade for 30 scans every month.")
-		}
-		return
-	}
-
-	scanID, reserved, rerr := a.reserveAIScan(ctx, u.ID, !u.premium(), limit, reqTZ(c))
+	scanID, used, reserved, rerr := a.reserveAIScan(ctx, u.ID, !u.premium(), limit, reqTZ(c))
 	if rerr != nil {
 		serverError(c, rerr)
 		return

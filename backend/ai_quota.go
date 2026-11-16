@@ -10,32 +10,32 @@ import (
 // A per-user advisory lock makes the check and the insert atomic, so the limit
 // holds even without the in-memory aiInFlight map (restarts, many instances).
 // lifetime=true counts all scans ever (free plan); false counts this month.
-func (a *App) reserveAIScan(ctx context.Context, uid any, lifetime bool, limit int, tz string) (int64, bool, error) {
+func (a *App) reserveAIScan(ctx context.Context, uid any, lifetime bool, limit int, tz string) (int64, int, bool, error) {
 	tx, err := a.db.Begin(ctx)
 	if err != nil {
-		return 0, false, err
+		return 0, 0, false, err
 	}
 	defer tx.Rollback(ctx)
 	if _, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock($1)`, uid); err != nil {
-		return 0, false, err
+		return 0, 0, false, err
 	}
 	var used int
 	if err := tx.QueryRow(ctx,
-		`SELECT COUNT(*)::int FROM ai_scans WHERE user_id = $1 AND ($2::bool OR created_at >= date_trunc('month', now() AT TIME ZONE COALESCE(NULLIF($3::text,''), current_setting('TimeZone'))) AT TIME ZONE COALESCE(NULLIF($3::text,''), current_setting('TimeZone')))`,
+		`SELECT COUNT(*)::int FROM ai_scans WHERE user_id = $1 AND ($2::bool OR created_at >= `+monthStartSQL(3)+`)`,
 		uid, lifetime, tz).Scan(&used); err != nil {
-		return 0, false, err
+		return 0, 0, false, err
 	}
 	if used >= limit {
-		return 0, false, nil
+		return 0, used, false, nil
 	}
 	var id int64
 	if err := tx.QueryRow(ctx, `INSERT INTO ai_scans (user_id) VALUES ($1) RETURNING id`, uid).Scan(&id); err != nil {
-		return 0, false, err
+		return 0, 0, false, err
 	}
 	if err := tx.Commit(ctx); err != nil {
-		return 0, false, err
+		return 0, 0, false, err
 	}
-	return id, true, nil
+	return id, used, true, nil
 }
 
 // releaseAIScan gives a reserved slot back when the scan did not complete.

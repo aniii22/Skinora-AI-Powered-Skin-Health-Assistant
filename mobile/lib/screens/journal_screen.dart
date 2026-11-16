@@ -39,6 +39,13 @@ int _monthCount(AppState s) {
       .length;
 }
 
+Widget _photoError(double height) => Container(
+  height: height,
+  alignment: Alignment.center,
+  color: AppColors.panel,
+  child: Text(Lang.I.tr('Photo could not be loaded'), style: AppText.caption),
+);
+
 /// Journal photo that sends the login token, so the server accepts it.
 Widget _journalPhoto(BuildContext context, JournalEntry e, {double? height}) {
   final s = AppScope.read(context);
@@ -62,12 +69,7 @@ Widget _journalPhoto(BuildContext context, JournalEntry e, {double? height}) {
         ),
       );
     },
-    errorBuilder: (_, _, _) => Container(
-      height: height ?? 80,
-      alignment: Alignment.center,
-      color: AppColors.panel,
-      child: Text(Lang.I.tr('Photo could not be loaded'), style: AppText.caption),
-    ),
+    errorBuilder: (_, _, _) => _photoError(height ?? 80),
   );
 }
 
@@ -84,14 +86,7 @@ Widget _fullPhoto(BuildContext context, JournalEntry e) {
         width: double.infinity,
         fit: BoxFit.contain,
         semanticLabel: 'Progress photo from ${prettyDate(e.day)}',
-        errorBuilder: (_, _, _) => Container(
-          height: 80,
-          alignment: Alignment.center,
-          child: const Text(
-            'Photo could not be loaded',
-            style: AppText.caption,
-          ),
-        ),
+        errorBuilder: (_, _, _) => _photoError(80),
       ),
     ),
   );
@@ -110,10 +105,12 @@ class JournalScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const PageHeader(
-              eyebrow: 'NOTICE & NOTE',
-              title: 'Your Skin Journey',
-              subtitle: 'Write down how your skin feels each day and optionally add a progress photo.',
+            PageHeader(
+              eyebrow: Lang.I.tr('NOTICE & NOTE'),
+              title: Lang.I.tr('Your Skin Journey'),
+              subtitle: Lang.I.tr(
+                'Write down how your skin feels each day and optionally add a progress photo.',
+              ),
             ),
             LoadGate(state: s, builder: () => _content(context, s)),
           ],
@@ -157,7 +154,9 @@ class JournalScreen extends StatelessWidget {
             if (!premium && _monthCount(s) >= 10) {
               showPremiumDialog(
                 context,
-                'Premium: the free plan allows 10 journal entries per month. Upgrade for unlimited entries.',
+                Lang.I.tr(
+                  'Premium: the free plan allows 10 journal entries per month. Upgrade for unlimited entries.',
+                ),
               );
               return;
             }
@@ -179,9 +178,10 @@ class JournalScreen extends StatelessWidget {
           ...timeline,
         ],
         const SizedBox(height: 6),
-        const InfoNote(
-          'Photos are stored on your own Skinora server and are not encrypted or sent anywhere else. '
-          'Deleting an entry or a photo removes the file from the server.',
+        InfoNote(
+          Lang.I.tr(
+            'Photos are stored on your own Skinora server and are not encrypted or sent anywhere else. Deleting an entry or a photo removes the file from the server.',
+          ),
           icon: Icons.lock_outline_rounded,
         ),
       ],
@@ -244,20 +244,24 @@ class _JournalHeader extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _stat('${entries.length}', 'Entries'),
-                  _stat('$monthCount', 'This month'),
+                  _stat('${entries.length}', Lang.I.tr('Entries')),
+                  _stat('$monthCount', Lang.I.tr('This month')),
                   _stat(
                     avg == null
                         ? '-'
                         : '${moodEmoji(avg.round())} ${avg.toStringAsFixed(1)}',
-                    'Avg mood',
+                    Lang.I.tr('Avg mood'),
                   ),
-                  _stat('$photoCount', 'Photos'),
+                  _stat('$photoCount', Lang.I.tr('Photos')),
                 ],
               ),
               const SizedBox(height: 12),
               Text(
-                premium ? Lang.I.tr('Unlimited entries') : Lang.I.tr('Free plan: last 2 days shown. Premium unlocks your full journey.'),
+                premium
+                    ? Lang.I.tr('Unlimited entries')
+                    : Lang.I.tr(
+                        'Free plan: last 2 days shown. Premium unlocks your full journey.',
+                      ),
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: .9),
                   fontSize: 12.5,
@@ -338,9 +342,11 @@ class _CompareCardState extends State<_CompareCard> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _sideItem(context, 'BEFORE', before)),
+                Expanded(
+                  child: _sideItem(context, Lang.I.tr('BEFORE'), before),
+                ),
                 const SizedBox(width: 10),
-                Expanded(child: _sideItem(context, 'AFTER', after)),
+                Expanded(child: _sideItem(context, Lang.I.tr('AFTER'), after)),
               ],
             )
           else
@@ -470,18 +476,20 @@ class _JournalTile extends StatelessWidget {
                 onPressed: () async {
                   final ok = await confirmDialog(
                     context,
-                    title: 'Delete journal entry?',
+                    title: Lang.I.tr('Delete journal entry?'),
                     message: e.hasPhoto
-                        ? Lang.I.tr('The note and its photo will be deleted permanently.')
+                        ? Lang.I.tr(
+                            'The note and its photo will be deleted permanently.',
+                          )
                         : Lang.I.tr('The note will be deleted permanently.'),
-                    confirmLabel: 'Delete',
+                    confirmLabel: Lang.I.tr('Delete'),
                   );
                   if (!ok || !context.mounted) return;
                   final err = await s.deleteJournal(e.id);
                   if (!context.mounted) return;
                   showSnack(
                     context,
-                    err ?? 'Entry deleted',
+                    err ?? Lang.I.tr('Entry deleted'),
                     error: err != null,
                   );
                 },
@@ -597,7 +605,9 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
     if (Session.I.user?.isPremium != true) {
       showPremiumDialog(
         context,
-        'Premium: progress photos are part of Premium. Upgrade to add photos.',
+        Lang.I.tr(
+          'Premium: progress photos are part of Premium. Upgrade to add photos.',
+        ),
       );
       return;
     }
@@ -612,8 +622,9 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
       if (!mounted) return;
       if (bytes.length > 5 * 1024 * 1024) {
         setState(
-          () => _error =
-              'That photo is larger than 5 MB. Please choose a smaller one.',
+          () => _error = Lang.I.tr(
+            'That photo is larger than 5 MB. Please choose a smaller one.',
+          ),
         );
         return;
       }
@@ -627,7 +638,9 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
       if (mounted) {
         showSnack(
           context,
-          'Could not open your photo library. Check that Skinora is allowed to access photos and try again.',
+          Lang.I.tr(
+            'Could not open your photo library. Check that Skinora is allowed to access photos and try again.',
+          ),
           error: true,
         );
       }
@@ -637,10 +650,11 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
   Future<void> _removeExistingPhoto() async {
     final ok = await confirmDialog(
       context,
-      title: 'Remove photo?',
-      message:
-          'The photo will be deleted from the server when you save this entry.',
-      confirmLabel: 'Remove',
+      title: Lang.I.tr('Remove photo?'),
+      message: Lang.I.tr(
+        'The photo will be deleted from the server when you save this entry.',
+      ),
+      confirmLabel: Lang.I.tr('Remove'),
     );
     if (ok && mounted) setState(() => _removePhoto = true);
   }
@@ -648,7 +662,7 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
   Future<void> _save() async {
     if (_busy || !_formKey.currentState!.validate()) return;
     if (_notes.text.trim().isEmpty && _rating == null) {
-      setState(() => _error = 'Add a note or pick a mood first.');
+      setState(() => _error = Lang.I.tr('Add a note or pick a mood first.'));
       return;
     }
     setState(() {
@@ -669,7 +683,7 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
       if (!mounted) return;
       setState(() {
         _busy = false;
-        _error = 'Could not save. Please try again.';
+        _error = Lang.I.tr('Could not save. Please try again.');
       });
       return;
     }
@@ -683,7 +697,7 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
     }
     showSnack(
       context,
-      r.message ?? 'Journal entry saved',
+      r.message ?? Lang.I.tr('Journal entry saved'),
       error: r.message != null,
     );
     setState(() => _busy = false);

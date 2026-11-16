@@ -322,4 +322,26 @@ const Map<String, List<String>> kTr = {
   "Dry skin": ["सूखी त्वचा", "कोरडी त्वचा"],
   "Normal skin": ["सामान्य त्वचा", "सामान्य त्वचा"],
   "Sensitive skin": ["संवेदनशील त्वचा", "संवेदनशील त्वचा"],
+  'Premium: the free plan allows 10 journal entries per month. Upgrade for unlimited entries.':
+      [
+        'फ़्री प्लान में हर महीने 10 जर्नल प्रविष्टियाँ मिलती हैं। असीमित प्रविष्टियों के लिए अपग्रेड करें।',
+        'फ्री प्लॅनमध्ये दर महिन्याला 10 जर्नल नोंदी मिळतात. अमर्याद नोंदींसाठी अपग्रेड करा.',
+      ],
+  'Premium: progress photos are part of Premium. Upgrade to add photos.': [
+    'प्रगति की फ़ोटो प्रीमियम में मिलती हैं। फ़ोटो जोड़ने के लिए अपग्रेड करें।',
+    'प्रगतीचे फोटो प्रीमियममध्ये मिळतात. फोटो जोडण्यासाठी अपग्रेड करा.',
+  ],
+  'That photo is larger than 5 MB. Please choose a smaller one.': [
+    'यह फ़ोटो 5 MB से बड़ी है। कृपया छोटी फ़ोटो चुनें।',
+    'हा फोटो 5 MB पेक्षा मोठा आहे. कृपया लहान फोटो निवडा.',
+  ],
+  'Could not open your photo library. Check that Skinora is allowed to access photos and try again.':
+      [
+        'फ़ोटो लाइब्रेरी नहीं खुल सकी। जाँचें कि Skinora को फ़ोटो की अनुमति है और फिर कोशिश करें।',
+        'फोटो लायब्ररी उघडता आली नाही. Skinora ला फोटोची परवानगी आहे का ते तपासा आणि पुन्हा प्रयत्न करा.',
+      ],
+  'Could not save. Please try again.': [
+    'सहेजा नहीं जा सका। कृपया फिर कोशिश करें।',
+    'जतन करता आले नाही. कृपया पुन्हा प्रयत्न करा.',
+  ],
 };
