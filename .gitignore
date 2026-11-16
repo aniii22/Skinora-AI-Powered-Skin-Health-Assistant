@@ -55,3 +55,6 @@ backup_fix*/
 *.f4-backup
 backend_upload.txt
 mobile_upload.txt
+
+i18n_report.txt
+i18n_scan.txt

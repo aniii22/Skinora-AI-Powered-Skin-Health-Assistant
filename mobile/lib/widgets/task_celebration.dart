@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
+
+import '../l10n/l10n.dart';
 
 /// Party-popper + confetti burst shown above a widget.
 class Celebrate {
@@ -13,8 +15,12 @@ class Celebrate {
   }
 
   /// Short name used by the routine screens.
-  static void show(BuildContext context, Rect rect,
-      {double size = 60, String? message}) {
+  static void show(
+    BuildContext context,
+    Rect rect, {
+    double size = 60,
+    String? message,
+  }) {
     showAtRect(context, rect, size: size);
     if (message != null && message.isNotEmpty) showToast(context, message);
   }
@@ -44,7 +50,8 @@ class Celebrate {
     if (overlay == null) return;
     late OverlayEntry entry;
     entry = OverlayEntry(
-      builder: (_) => _Burst(rect: rect, size: size, onDone: () => entry.remove()),
+      builder: (_) =>
+          _Burst(rect: rect, size: size, onDone: () => entry.remove()),
     );
     overlay.insert(entry);
   }
@@ -65,11 +72,15 @@ class _BurstState extends State<_Burst> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500))
-      ..addStatusListener((s) {
-        if (s == AnimationStatus.completed) widget.onDone();
-      })
-      ..forward();
+    _c =
+        AnimationController(
+            vsync: this,
+            duration: const Duration(milliseconds: 1500),
+          )
+          ..addStatusListener((s) {
+            if (s == AnimationStatus.completed) widget.onDone();
+          })
+          ..forward();
   }
 
   @override
@@ -141,7 +152,9 @@ class _ConfettiPainter extends CustomPainter {
       final dx = math.cos(a) * dist * ease;
       final dy = math.sin(a) * dist * ease + 60 * t * t;
       final p = Paint()
-        ..color = _colors[i % _colors.length].withValues(alpha: (1 - t).clamp(0.0, 1.0));
+        ..color = _colors[i % _colors.length].withValues(
+          alpha: (1 - t).clamp(0.0, 1.0),
+        );
       canvas.save();
       canvas.translate(origin.dx + dx, origin.dy + dy - 10);
       canvas.rotate(a + t * 6);
@@ -159,6 +172,7 @@ class _ConfettiPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _ConfettiPainter old) => old.t != t;
 }
+
 class _Toast extends StatefulWidget {
   const _Toast({required this.text, required this.onDone});
   final String text;
@@ -173,11 +187,15 @@ class _ToastState extends State<_Toast> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 2200))
-      ..addStatusListener((s) {
-        if (s == AnimationStatus.completed) widget.onDone();
-      })
-      ..forward();
+    _c =
+        AnimationController(
+            vsync: this,
+            duration: const Duration(milliseconds: 2200),
+          )
+          ..addStatusListener((s) {
+            if (s == AnimationStatus.completed) widget.onDone();
+          })
+          ..forward();
   }
 
   @override
@@ -213,19 +231,31 @@ class _ToastState extends State<_Toast> with SingleTickerProviderStateMixin {
                           constraints: const BoxConstraints(maxWidth: 340),
                           child: Container(
                             margin: const EdgeInsets.symmetric(horizontal: 16),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: const Color(0xFFE8D9B5)),
+                              border: Border.all(
+                                color: const Color(0xFFE8D9B5),
+                              ),
                               boxShadow: const [
-                                BoxShadow(color: Color(0x26000000), blurRadius: 14, offset: Offset(0, 4)),
+                                BoxShadow(
+                                  color: Color(0x26000000),
+                                  blurRadius: 14,
+                                  offset: Offset(0, 4),
+                                ),
                               ],
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Text('\u{1F389}', style: TextStyle(fontSize: 22)),
+                                const Text(
+                                  '\u{1F389}',
+                                  style: TextStyle(fontSize: 22),
+                                ),
                                 const SizedBox(width: 10),
                                 Flexible(
                                   child: Text(

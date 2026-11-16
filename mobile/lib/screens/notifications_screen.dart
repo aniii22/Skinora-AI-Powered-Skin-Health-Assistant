@@ -370,12 +370,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         title: Text(_unread > 0 ? 'Notifications ($_unread)' : 'Notifications'),
         actions: [
           IconButton(
-            tooltip: 'Mark all as read',
+            tooltip: Lang.I.tr('Mark all as read'),
             onPressed: (_busy || _unread == 0) ? null : _markAll,
             icon: const Icon(Icons.done_all_rounded),
           ),
           IconButton(
-            tooltip: 'Clear history',
+            tooltip: Lang.I.tr('Clear history'),
             onPressed: (_busy || _items.isEmpty) ? null : _clear,
             icon: const Icon(Icons.delete_sweep_rounded),
           ),

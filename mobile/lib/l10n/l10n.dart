@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'strings.dart';
 import 'strings_extra.dart';
+import 'strings_more.dart';
 
 /// App language. Codes: en, hi, mr.
 class Lang extends ChangeNotifier {
@@ -57,11 +58,8 @@ class Lang extends ChangeNotifier {
   static final _num = RegExp(r'\d+(?:\.\d+)?');
   static final _ws = RegExp(r'\s+');
 
-  static String _norm(String s) => s
-      .replaceAll('\u2019', "'")
-      .replaceAll(_ws, ' ')
-      .trim()
-      .toLowerCase();
+  static String _norm(String s) =>
+      s.replaceAll('\u2019', "'").replaceAll(_ws, ' ').trim().toLowerCase();
 
   static Map<String, List<String>>? _idx;
 
@@ -71,6 +69,7 @@ class Lang extends ChangeNotifier {
     final cached = _idx;
     if (cached != null) return cached;
     final idx = <String, List<String>>{};
+    kTrMore.forEach((k, v) => idx[_norm(k)] = List<String>.from(v));
     kTrExtra.forEach((k, v) => idx[_norm(k)] = List<String>.from(v));
     kTr.forEach((k, v) => idx[_norm(k)] = List<String>.from(v));
     return _idx = idx;
@@ -106,17 +105,27 @@ class Lang extends ChangeNotifier {
   /// "A: B", "A · B", "A • B", "A, B" -> translate each side.
   String? _split(String s, int i) {
     final t = s.replaceAll('\u00A0', ' ');
-    for (final sep in const [' \u00B7 ', ' \u2022 ', ': ', ', ', ' / ', ' - ']) {
+    for (final sep in const [
+      ' \u00B7 ',
+      ' \u2022 ',
+      ': ',
+      ', ',
+      ' / ',
+      ' - ',
+    ]) {
       if (!t.contains(sep)) continue;
       var any = false;
-      final out = t.split(sep).map((p) {
-        final x = _piece(p, i);
-        if (x != null) {
-          any = true;
-          return x;
-        }
-        return p;
-      }).join(sep);
+      final out = t
+          .split(sep)
+          .map((p) {
+            final x = _piece(p, i);
+            if (x != null) {
+              any = true;
+              return x;
+            }
+            return p;
+          })
+          .join(sep);
       if (any) return out;
     }
     return null;

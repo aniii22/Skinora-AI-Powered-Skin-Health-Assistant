@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart' hide Text;
+
 import '../l10n/l10n.dart';
+
 import 'package:flutter/services.dart';
 
 import '../auth/session.dart';
@@ -207,7 +209,7 @@ class _EditAccountSheetState extends State<_EditAccountSheet> {
             ),
           ),
           IconButton(
-            tooltip: 'Close',
+            tooltip: Lang.I.tr('Close'),
             onPressed: _busy ? null : () => Navigator.of(context).pop(),
             icon: const Icon(Icons.close_rounded, color: Colors.white),
           ),
@@ -266,7 +268,9 @@ class _EditAccountSheetState extends State<_EditAccountSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -286,7 +290,7 @@ class _EditAccountSheetState extends State<_EditAccountSheet> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: _vName,
                       decoration: InputDecoration(
-                        labelText: 'Name',
+                        labelText: Lang.I.tr('Name'),
                         prefixIcon: const Icon(Icons.person_outline_rounded),
                         suffixIcon: _tick(_vName(_name.text) == null),
                       ),
@@ -304,11 +308,10 @@ class _EditAccountSheetState extends State<_EditAccountSheet> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: _vEmail,
                       decoration: InputDecoration(
-                        labelText: 'Email',
+                        labelText: Lang.I.tr('Email'),
                         prefixIcon: const Icon(Icons.mail_outline_rounded),
                         suffixIcon: _tick(
-                          _vEmail(_email.text) == null &&
-                              _suggestion == null,
+                          _vEmail(_email.text) == null && _suggestion == null,
                         ),
                       ),
                     ),
@@ -326,11 +329,13 @@ class _EditAccountSheetState extends State<_EditAccountSheet> {
                                     AutovalidateMode.onUserInteraction,
                                 validator: _vPass,
                                 decoration: InputDecoration(
-                                  labelText: 'Current password',
-                                  helperText:
-                                      'Needed to confirm it is you when changing email.',
-                                  prefixIcon:
-                                      const Icon(Icons.lock_outline_rounded),
+                                  labelText: Lang.I.tr('Current password'),
+                                  helperText: Lang.I.tr(
+                                    'Needed to confirm it is you when changing email.',
+                                  ),
+                                  prefixIcon: const Icon(
+                                    Icons.lock_outline_rounded,
+                                  ),
                                   suffixIcon: IconButton(
                                     tooltip: _showPass
                                         ? 'Hide password'
@@ -383,8 +388,9 @@ class _EditAccountSheetState extends State<_EditAccountSheet> {
                       children: [
                         Expanded(
                           child: OutlinedButton(
-                            onPressed:
-                                _busy ? null : () => Navigator.of(context).pop(),
+                            onPressed: _busy
+                                ? null
+                                : () => Navigator.of(context).pop(),
                             child: const Text('Cancel'),
                           ),
                         ),

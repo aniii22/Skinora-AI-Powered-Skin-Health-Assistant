@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Text;
+
 import '../l10n/l10n.dart';
 import '../utils/format.dart';
 
@@ -108,7 +109,8 @@ class _RemindersScreenState extends State<RemindersScreen> {
   Future<void> _load({bool silent = false}) async {
     if (!silent) setState(() => _loading = true);
     try {
-      final m = (await _api.request('GET', '/api/reminders')) as Map<String, dynamic>;
+      final m =
+          (await _api.request('GET', '/api/reminders')) as Map<String, dynamic>;
       final p = m['prefs'] as Map<String, dynamic>;
       final list = (m['items'] as List)
           .map((e) => Reminder.fromJson(e as Map<String, dynamic>))
@@ -173,7 +175,11 @@ class _RemindersScreenState extends State<RemindersScreen> {
     );
     if (t == null || !mounted) return;
     if (_hhmm(t) == (start ? _qe : _qs)) {
-      showSnack(context, 'Quiet hours start and end cannot be the same.', error: true);
+      showSnack(
+        context,
+        'Quiet hours start and end cannot be the same.',
+        error: true,
+      );
       return;
     }
     setState(() {
@@ -222,7 +228,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
     try {
       await _api.request('POST', '/api/notifications/test');
       await LocalNotifier.I.testNow();
-      if (mounted) showSnack(context, 'Test notification added. Check the bell.');
+      if (mounted) {
+        showSnack(context, 'Test notification added. Check the bell.');
+      }
     } on ApiException catch (e) {
       if (mounted) showSnack(context, e.message, error: true);
     }
@@ -258,9 +266,17 @@ class _RemindersScreenState extends State<RemindersScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(r.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppText.cardTitle),
+                    Text(
+                      r.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppText.cardTitle,
+                    ),
                     const SizedBox(height: 2),
-                    Text('${r.time}  \u00B7  ${_daysLabel(r.days)}', style: AppText.caption),
+                    Text(
+                      '${r.time}  \u00B7  ${_daysLabel(r.days)}',
+                      style: AppText.caption,
+                    ),
                   ],
                 ),
               ),
@@ -281,9 +297,17 @@ class _RemindersScreenState extends State<RemindersScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.cloud_off_rounded, size: 44, color: AppColors.muted),
+              const Icon(
+                Icons.cloud_off_rounded,
+                size: 44,
+                color: AppColors.muted,
+              ),
               const SizedBox(height: 12),
-              Text(_error!, textAlign: TextAlign.center, style: AppText.bodyMuted),
+              Text(
+                _error!,
+                textAlign: TextAlign.center,
+                style: AppText.bodyMuted,
+              ),
               const SizedBox(height: 14),
               FilledButton(onPressed: _load, child: const Text('Try again')),
             ],
@@ -305,8 +329,14 @@ class _RemindersScreenState extends State<RemindersScreen> {
             children: [
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('All notifications', style: AppText.cardTitle),
-                subtitle: const Text('Turn off to pause every reminder', style: AppText.caption),
+                title: const Text(
+                  'All notifications',
+                  style: AppText.cardTitle,
+                ),
+                subtitle: const Text(
+                  'Turn off to pause every reminder',
+                  style: AppText.caption,
+                ),
                 value: _all,
                 onChanged: (v) {
                   setState(() => _all = v);
@@ -317,7 +347,10 @@ class _RemindersScreenState extends State<RemindersScreen> {
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('Quiet hours', style: AppText.cardTitle),
-                subtitle: const Text('No reminders during this time', style: AppText.caption),
+                subtitle: const Text(
+                  'No reminders during this time',
+                  style: AppText.caption,
+                ),
                 value: _quiet,
                 onChanged: (v) {
                   setState(() => _quiet = v);
@@ -512,12 +545,20 @@ class _ReminderFormState extends State<_ReminderForm> {
       ('custom', 'Custom'),
     ];
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(20, 4, 20, 20 + MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        4,
+        20,
+        20 + MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(widget.existing == null ? 'New reminder' : 'Edit reminder', style: AppText.sectionTitle),
+          Text(
+            widget.existing == null ? 'New reminder' : 'Edit reminder',
+            style: AppText.sectionTitle,
+          ),
           const SizedBox(height: 14),
           Wrap(
             spacing: 8,
@@ -533,20 +574,28 @@ class _ReminderFormState extends State<_ReminderForm> {
           if (_kind == 'water')
             const Padding(
               padding: EdgeInsets.only(top: 8),
-              child: Text('The message uses your saved glass size.', style: AppText.caption),
+              child: Text(
+                'The message uses your saved glass size.',
+                style: AppText.caption,
+              ),
             ),
           if (_kind == 'custom') ...[
             const SizedBox(height: 12),
             TextField(
               controller: _title,
               maxLength: 60,
-              decoration: const InputDecoration(labelText: 'Reminder title'),
+              decoration: InputDecoration(
+                labelText: Lang.I.tr('Reminder title'),
+              ),
             ),
           ],
           const SizedBox(height: 12),
           OutlinedButton.icon(
             onPressed: () async {
-              final t = await showTimePicker(context: context, initialTime: _time);
+              final t = await showTimePicker(
+                context: context,
+                initialTime: _time,
+              );
               if (t != null) setState(() => _time = t);
             },
             icon: const Icon(Icons.access_time_rounded),
@@ -578,7 +627,10 @@ class _ReminderFormState extends State<_ReminderForm> {
               if (widget.existing != null)
                 TextButton(
                   onPressed: _busy ? null : _delete,
-                  child: const Text('Delete', style: TextStyle(color: AppColors.danger)),
+                  child: const Text(
+                    'Delete',
+                    style: TextStyle(color: AppColors.danger),
+                  ),
                 ),
               const Spacer(),
               FilledButton(
@@ -587,7 +639,10 @@ class _ReminderFormState extends State<_ReminderForm> {
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : const Text('Save'),
               ),
