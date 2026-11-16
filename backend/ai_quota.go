@@ -10,7 +10,7 @@ import (
 // A per-user advisory lock makes the check and the insert atomic, so the limit
 // holds even without the in-memory aiInFlight map (restarts, many instances).
 // lifetime=true counts all scans ever (free plan); false counts this month.
-func (a *App) reserveAIScan(ctx context.Context, uid any, lifetime bool, limit int) (int64, bool, error) {
+func (a *App) reserveAIScan(ctx context.Context, uid any, lifetime bool, limit int, tz string) (int64, bool, error) {
 	tx, err := a.db.Begin(ctx)
 	if err != nil {
 		return 0, false, err
@@ -21,8 +21,8 @@ func (a *App) reserveAIScan(ctx context.Context, uid any, lifetime bool, limit i
 	}
 	var used int
 	if err := tx.QueryRow(ctx,
-		`SELECT COUNT(*)::int FROM ai_scans WHERE user_id = $1 AND ($2::bool OR created_at >= date_trunc('month', now()))`,
-		uid, lifetime).Scan(&used); err != nil {
+		`SELECT COUNT(*)::int FROM ai_scans WHERE user_id = $1 AND ($2::bool OR created_at >= date_trunc('month', now() AT TIME ZONE COALESCE(NULLIF($3::text,''), current_setting('TimeZone'))) AT TIME ZONE COALESCE(NULLIF($3::text,''), current_setting('TimeZone')))`,
+		uid, lifetime, tz).Scan(&used); err != nil {
 		return 0, false, err
 	}
 	if used >= limit {

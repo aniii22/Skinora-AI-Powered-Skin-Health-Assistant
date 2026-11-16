@@ -211,7 +211,7 @@ func (a *App) skinAnalysis(c *gin.Context) {
 		return
 	}
 
-	scanID, reserved, rerr := a.reserveAIScan(ctx, u.ID, !u.premium(), limit)
+	scanID, reserved, rerr := a.reserveAIScan(ctx, u.ID, !u.premium(), limit, reqTZ(c))
 	if rerr != nil {
 		serverError(c, rerr)
 		return

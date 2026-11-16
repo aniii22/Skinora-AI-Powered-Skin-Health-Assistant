@@ -66,7 +66,7 @@ Widget _journalPhoto(BuildContext context, JournalEntry e, {double? height}) {
       height: height ?? 80,
       alignment: Alignment.center,
       color: AppColors.panel,
-      child: const Text('Photo could not be loaded', style: AppText.caption),
+      child: Text(Lang.I.tr('Photo could not be loaded'), style: AppText.caption),
     ),
   );
 }
@@ -104,7 +104,7 @@ class JournalScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Your Skin Journey')),
+      appBar: AppBar(title: Text(Lang.I.tr('Your Skin Journey'))),
       body: ResponsivePage(
         maxWidth: 720,
         child: Column(
@@ -168,10 +168,10 @@ class JournalScreen extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         if (entries.isEmpty)
-          const EmptyState(
+          EmptyState(
             icon: Icons.auto_awesome_rounded,
-            title: 'No journal entries yet',
-            message: 'Your entries will appear here, newest first.',
+            title: Lang.I.tr('No journal entries yet'),
+            message: Lang.I.tr('Your entries will appear here, newest first.'),
           )
         else ...[
           _CompareCard(photos: photos),
@@ -257,7 +257,7 @@ class _JournalHeader extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                premium ? 'Unlimited entries' : 'Free plan: last 2 days shown. Premium unlocks your full journey.',
+                premium ? Lang.I.tr('Unlimited entries') : Lang.I.tr('Free plan: last 2 days shown. Premium unlocks your full journey.'),
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: .9),
                   fontSize: 12.5,
@@ -308,7 +308,9 @@ class _CompareCardState extends State<_CompareCard> {
     final before = photos.last;
     final after = photos.first;
     final days = DateTime.utc(after.day.year, after.day.month, after.day.day)
-        .difference(DateTime.utc(before.day.year, before.day.month, before.day.day))
+        .difference(
+          DateTime.utc(before.day.year, before.day.month, before.day.day),
+        )
         .inDays;
 
     return AppSurface(
@@ -457,21 +459,21 @@ class _JournalTile extends StatelessWidget {
                 ),
               ),
               IconButton(
-                tooltip: 'Edit entry from ${prettyDate(e.day)}',
+                tooltip: Lang.I.tr('Edit entry from ${prettyDate(e.day)}'),
                 icon: const Icon(Icons.edit_outlined),
                 onPressed: () =>
                     openScreen(context, JournalEditorScreen(existing: e)),
               ),
               IconButton(
-                tooltip: 'Delete entry from ${prettyDate(e.day)}',
+                tooltip: Lang.I.tr('Delete entry from ${prettyDate(e.day)}'),
                 icon: const Icon(Icons.delete_outline_rounded),
                 onPressed: () async {
                   final ok = await confirmDialog(
                     context,
                     title: 'Delete journal entry?',
                     message: e.hasPhoto
-                        ? 'The note and its photo will be deleted permanently.'
-                        : 'The note will be deleted permanently.',
+                        ? Lang.I.tr('The note and its photo will be deleted permanently.')
+                        : Lang.I.tr('The note will be deleted permanently.'),
                     confirmLabel: 'Delete',
                   );
                   if (!ok || !context.mounted) return;
@@ -889,8 +891,9 @@ class _JournalEditorScreenState extends State<JournalEditorScreen> {
               ListenableBuilder(
                 listenable: _notes,
                 builder: (context, _) {
-                  final chosen =
-                      _noteParts().map((e) => e.toLowerCase()).toSet();
+                  final chosen = _noteParts()
+                      .map((e) => e.toLowerCase())
+                      .toSet();
                   return QuickTags(
                     tags: _quickTags,
                     selected: chosen,
