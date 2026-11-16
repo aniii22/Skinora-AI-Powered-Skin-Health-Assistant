@@ -50,3 +50,8 @@ backup_fix*/
 .safe-backups/
 *.f19-backup
 *.backup-before-lint-fix
+
+*.backup-*
+*.f4-backup
+backend_upload.txt
+mobile_upload.txt
